@@ -1,0 +1,33 @@
+package com.naribackend.api.auth.v1;
+
+import com.naribackend.api.auth.v1.request.SendVerificationCodeRequest;
+import com.naribackend.core.auth.AuthService;
+import com.naribackend.support.response.ApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/v1/auth")
+@RequiredArgsConstructor
+public class AuthController {
+
+    private final AuthService authService;
+
+
+    @Operation(
+            summary = "이메일 인증 코드 발송",
+            description = "이메일 인증 코드를 발송 합니다."
+    )
+    @PostMapping("/email-verification-code")
+    public ResponseEntity<ApiResponse<?>> sendVerificationCode(
+         @RequestBody @Valid final SendVerificationCodeRequest request
+    ) {
+        authService.processVerificationCode(request.toUserEmail());
+
+        return ResponseEntity.ok(ApiResponse.success());
+    }
+
+}
