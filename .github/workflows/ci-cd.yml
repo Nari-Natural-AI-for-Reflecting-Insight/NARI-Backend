@@ -12,12 +12,6 @@ jobs:
   build-test-and-push:
     name: Build · Test · Dockerize · Push
     runs-on: ubuntu-latest
-    env:
-      SPRING_DATASOURCE_URL: ${{ secrets.SPRING_DATASOURCE_URL }}
-      SPRING_DATASOURCE_USERNAME: ${{ secrets.SPRING_DATASOURCE_USERNAME }}
-      SPRING_DATASOURCE_PASSWORD: ${{ secrets.SPRING_DATASOURCE_PASSWORD }}
-      MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
-      MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
 
     steps:
       - name: Checkout repository
@@ -28,6 +22,11 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+
+      - name: Create application.yml from Secret
+        run: |
+          mkdir -p src/main/resources
+          echo "${{ secrets.APPLICATION_YML_B64 }}" | base64 --decode > src/main/resources/application.yml
 
       - name: Build & Test
         run: |
