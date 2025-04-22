@@ -20,7 +20,10 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/api/v1/auth/email-verification-code").permitAll()
+                    .requestMatchers(
+                            "/api/v1/auth/email-verification-code",
+                            "/api/v1/auth/email-verification-code/check"
+                    ).permitAll()
                     .requestMatchers(
                             "/v3/api-docs/**",
                             "/swagger-ui.html",

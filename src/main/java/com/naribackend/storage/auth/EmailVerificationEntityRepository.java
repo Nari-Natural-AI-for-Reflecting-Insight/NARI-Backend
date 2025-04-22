@@ -15,7 +15,7 @@ public class EmailVerificationEntityRepository implements EmailVerificationRepos
     private final EmailVerificationJpaRepository emailVerificationJpaRepository;
 
     @Override
-    public void appendEmailVerification(final EmailVerification emailVerification) {
+    public void saveEmailVerification(final EmailVerification emailVerification) {
         EmailVerificationEntity emailVerificationEntity = EmailVerificationEntity.from(emailVerification);
 
         emailVerificationJpaRepository.save(emailVerificationEntity);
@@ -31,12 +31,5 @@ public class EmailVerificationEntityRepository implements EmailVerificationRepos
     @Override
     public boolean existsByUserEmail(UserEmail userEmail) {
         return emailVerificationJpaRepository.existsByUserEmail(userEmail.getAddress());
-    }
-
-    @Override
-    public void modifyEmailVerification(EmailVerification emailVerification) {
-        EmailVerificationEntity emailVerificationEntity = EmailVerificationEntity.from(emailVerification);
-
-        emailVerificationJpaRepository.save(emailVerificationEntity);
     }
 }

@@ -17,6 +17,6 @@ public class EmailVerificationAppender {
                 .isVerified(false)
                 .build();
 
-        emailVerificationRepository.appendEmailVerification(emailVerification);
+        emailVerificationRepository.saveEmailVerification(emailVerification);
     }
 }

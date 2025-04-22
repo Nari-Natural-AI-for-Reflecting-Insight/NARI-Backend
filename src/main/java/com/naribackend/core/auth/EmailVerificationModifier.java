@@ -18,6 +18,12 @@ public class EmailVerificationModifier {
 
         foundEmailVerification.updateVerificationCode(newVerificationCode);
 
-        emailVerificationRepository.modifyEmailVerification(foundEmailVerification);
+        emailVerificationRepository.saveEmailVerification(foundEmailVerification);
+    }
+
+    public void modifyAsVerified(final EmailVerification savedEmailVerification) {
+        savedEmailVerification.markAsVerified();
+
+        emailVerificationRepository.saveEmailVerification(savedEmailVerification);
     }
 }
