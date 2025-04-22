@@ -1,5 +1,6 @@
 package com.naribackend.api.auth.v1;
 
+import com.naribackend.api.auth.v1.request.CheckVerificationCodeRequest;
 import com.naribackend.api.auth.v1.request.SendVerificationCodeRequest;
 import com.naribackend.core.auth.AuthService;
 import com.naribackend.support.response.ApiResponse;
@@ -25,6 +26,19 @@ public class AuthController {
          @RequestBody @Valid final SendVerificationCodeRequest request
     ) {
         authService.processVerificationCode(request.toUserEmail());
+
+        return ApiResponse.success();
+    }
+
+    @Operation(
+            summary = "이메일 인증 코드 확인",
+            description = "이메일 인증 코드를 확인합니다."
+    )
+    @PostMapping("/email-verification-code/check")
+    public ApiResponse<?> checkVerificationCode(
+            @RequestBody @Valid final CheckVerificationCodeRequest request
+    ) {
+        authService.checkVerificationCode(request.toUserEmail(), request.toVerificationCode());
 
         return ApiResponse.success();
     }

@@ -29,4 +29,20 @@ public class VerificationCode {
     public String toString() {
         return code;
     }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null || getClass() != obj.getClass()) return false;
+        if( obj.hashCode() != this.hashCode() ) return false;
+        if (this == obj) return true;
+
+        VerificationCode that = (VerificationCode) obj;
+
+        return code.equals(that.code);
+    }
+
+    @Override
+    public int hashCode() {
+        return code.hashCode();
+    }
 }

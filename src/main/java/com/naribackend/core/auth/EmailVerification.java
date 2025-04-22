@@ -15,7 +15,7 @@ public class EmailVerification {
     private final Long id;
     private final UserEmail userEmail;
     private VerificationCode verificationCode;
-    private final boolean isVerified;
+    private boolean isVerified;
 
     @Builder
     public EmailVerification(
@@ -40,5 +40,13 @@ public class EmailVerification {
 
     public String verificationCodeStr() {
         return verificationCode.toString();
+    }
+
+    public boolean isSameVerificationCode(final VerificationCode verificationCode) {
+        return this.verificationCode.equals(verificationCode);
+    }
+
+    public void markAsVerified() {
+        this.isVerified = true;
     }
 }
