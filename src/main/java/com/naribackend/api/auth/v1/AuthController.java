@@ -6,7 +6,6 @@ import com.naribackend.support.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,12 +21,12 @@ public class AuthController {
             description = "이메일 인증 코드를 발송 합니다."
     )
     @PostMapping("/email-verification-code")
-    public ResponseEntity<ApiResponse<?>> sendVerificationCode(
+    public ApiResponse<?> sendVerificationCode(
          @RequestBody @Valid final SendVerificationCodeRequest request
     ) {
         authService.processVerificationCode(request.toUserEmail());
 
-        return ResponseEntity.ok(ApiResponse.success());
+        return ApiResponse.success();
     }
 
 }
