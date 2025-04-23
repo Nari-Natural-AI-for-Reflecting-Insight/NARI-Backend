@@ -1,6 +1,7 @@
 package com.naribackend.api.auth.v1;
 
 import com.naribackend.api.auth.v1.request.CheckVerificationCodeRequest;
+import com.naribackend.api.auth.v1.request.CreateUserAccountRequest;
 import com.naribackend.api.auth.v1.request.SendVerificationCodeRequest;
 import com.naribackend.core.auth.AuthService;
 import com.naribackend.support.response.ApiResponse;
@@ -43,4 +44,16 @@ public class AuthController {
         return ApiResponse.success();
     }
 
+    @Operation(
+            summary = "회원가입",
+            description = "회원가입을 진행합니다."
+    )
+    @PostMapping("/sign-up")
+    public ApiResponse<?> signUp(
+            @RequestBody @Valid final CreateUserAccountRequest request
+    ) {
+        authService.signUp(request.toUserEmail(), request.toRawUserPassword(), request.newNickname());
+
+        return ApiResponse.success();
+    }
 }

@@ -17,6 +17,12 @@ public class AuthService {
     private final EmailVerificationModifier emailVerificationModifier;
     private final EmailVerificationRepository emailVerificationRepository;
     private final EmailVerificationAppender emailVerificationAppender;
+    private final EmailVerificationReader emailVerificationReader;
+
+    private final UserPasswordEncoder userPasswordEncoder;
+
+    private final UserAccountAppender userAccountAppender;
+    private final UserAccountRepository userAccountRepository;
 
     public void processVerificationCode(final UserEmail toUserEmail) {
         final VerificationCode verificationCode = VerificationCode.generateSixDigitCode();
@@ -48,5 +54,26 @@ public class AuthService {
         }
 
         emailVerificationModifier.modifyAsVerified(savedEmailVerification);
+    }
+
+    public void signUp(
+            final UserEmail newUserEmail,
+            final RawUserPassword newRawUserPassword,
+            final String newNickname
+    ) {
+        if(!emailVerificationReader.isVerified(newUserEmail)) {
+            throw new CoreException(ErrorType.NOT_VERIFIED_EMAIL);
+        }
+
+        if(userAccountRepository.existsByEmail(newUserEmail)) {
+            throw new CoreException(ErrorType.ALEADY_SIGNED_EMAIL);
+        }
+
+        EncodedUserPassword encodedUserPassword = newRawUserPassword.encode(userPasswordEncoder);
+        userAccountAppender.appendUserAccount(
+                newUserEmail,
+                encodedUserPassword,
+                newNickname
+        );
     }
 }

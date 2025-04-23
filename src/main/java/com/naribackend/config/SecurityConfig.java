@@ -22,7 +22,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                     .requestMatchers(
                             "/api/v1/auth/email-verification-code",
-                            "/api/v1/auth/email-verification-code/check"
+                            "/api/v1/auth/email-verification-code/check",
+                            "/api/v1/auth/sign-up"
                     ).permitAll()
                     .requestMatchers(
                             "/v3/api-docs/**",
