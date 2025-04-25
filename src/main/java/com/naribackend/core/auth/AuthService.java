@@ -1,8 +1,8 @@
 package com.naribackend.core.auth;
 
-import com.naribackend.core.email.UserEmail;
-import com.naribackend.core.email.EmailSender;
 import com.naribackend.core.email.EmailMessage;
+import com.naribackend.core.email.EmailSender;
+import com.naribackend.core.email.UserEmail;
 import com.naribackend.support.error.CoreException;
 import com.naribackend.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +23,8 @@ public class AuthService {
 
     private final UserAccountAppender userAccountAppender;
     private final UserAccountRepository userAccountRepository;
+
+    private final AccessTokenHandler accessTokenHandler;
 
     public void processVerificationCode(final UserEmail toUserEmail) {
         final VerificationCode verificationCode = VerificationCode.generateSixDigitCode();
@@ -66,7 +68,7 @@ public class AuthService {
         }
 
         if(userAccountRepository.existsByEmail(newUserEmail)) {
-            throw new CoreException(ErrorType.ALEADY_SIGNED_EMAIL);
+            throw new CoreException(ErrorType.ALREADY_SIGNED_EMAIL);
         }
 
         EncodedUserPassword encodedUserPassword = newRawUserPassword.encode(userPasswordEncoder);
@@ -75,5 +77,14 @@ public class AuthService {
                 encodedUserPassword,
                 newNickname
         );
+    }
+
+    public String createAccessToken(final UserEmail userEmail, final RawUserPassword rawUserPassword) {
+        UserAccount userAccount = userAccountRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_EMAIL));
+
+        rawUserPassword.matches(userPasswordEncoder, userAccount.getEncodedUserPassword());
+
+        return accessTokenHandler.createTokenBy(userAccount.getId());
     }
 }

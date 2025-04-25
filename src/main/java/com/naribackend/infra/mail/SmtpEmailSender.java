@@ -1,7 +1,7 @@
 package com.naribackend.infra.mail;
 
-import com.naribackend.core.email.EmailSender;
 import com.naribackend.core.email.EmailMessage;
+import com.naribackend.core.email.EmailSender;
 import com.naribackend.support.error.CoreException;
 import com.naribackend.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;

@@ -2,13 +2,18 @@ package com.naribackend.api.auth.v1;
 
 import com.naribackend.api.auth.v1.request.CheckVerificationCodeRequest;
 import com.naribackend.api.auth.v1.request.CreateUserAccountRequest;
+import com.naribackend.api.auth.v1.request.GetAccessTokenRequest;
 import com.naribackend.api.auth.v1.request.SendVerificationCodeRequest;
+import com.naribackend.api.auth.v1.response.GetAccessTokenResponse;
 import com.naribackend.core.auth.AuthService;
 import com.naribackend.support.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -55,5 +60,20 @@ public class AuthController {
         authService.signUp(request.toUserEmail(), request.toRawUserPassword(), request.newNickname());
 
         return ApiResponse.success();
+    }
+
+    @Operation(
+            summary = "로그인",
+            description = "로그인을 하고 Access Token을 발급받습니다."
+    )
+    @PostMapping("/sign-in/access-token")
+    public ApiResponse<?> signIn(
+            @RequestBody @Valid final GetAccessTokenRequest request
+    ) {
+        String accessToken = authService.createAccessToken(request.toUserEmail(), request.toRawUserPassword());
+
+        return ApiResponse.success(
+                new GetAccessTokenResponse(accessToken)
+        );
     }
 }
