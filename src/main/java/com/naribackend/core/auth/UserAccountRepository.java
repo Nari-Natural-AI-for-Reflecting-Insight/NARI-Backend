@@ -10,4 +10,6 @@ public interface UserAccountRepository {
     boolean existsByEmail(UserEmail email);
 
     Optional<UserAccount> findByEmail(UserEmail userEmail);
+
+    Optional<UserAccount> findById(Long id);
 }

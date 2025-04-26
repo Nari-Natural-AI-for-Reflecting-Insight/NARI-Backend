@@ -87,4 +87,10 @@ public class AuthService {
 
         return accessTokenHandler.createTokenBy(userAccount.getId());
     }
+
+    public UserAccount getUserAccountBy(final LoginUser loginUser) {
+        return userAccountRepository.findById(loginUser.getId())
+                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_EMAIL));
+    }
+
 }

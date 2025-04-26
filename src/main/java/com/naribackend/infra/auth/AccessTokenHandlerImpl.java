@@ -32,7 +32,7 @@ public class AccessTokenHandlerImpl implements AccessTokenHandler {
     }
 
     @Override
-    public String createTokenBy(Long userId) {
+    public String createTokenBy(long userId) {
         Instant now = Instant.now();
 
         return Jwts.builder()
@@ -45,20 +45,39 @@ public class AccessTokenHandlerImpl implements AccessTokenHandler {
 
 
     @Override
-    public Long getUserIdFrom(String token) {
+    public long getUserIdFrom(String token) {
         try {
             Claims claims = Jwts.parser().verifyWith(secretKey)
                     .build().parseSignedClaims(token).getPayload();
 
             String userIdStr = claims.getSubject();
 
-            return Long.valueOf(userIdStr);
+            return Long.parseLong(userIdStr);
         } catch (NumberFormatException e) {
-            log.error("userId를 Long으로 변경하는 과정에서 에러가 발생하였습니다. 빨리 확인 바랍니다.", e);
+            log.error("userId를 Long으로 변경하는 과정에서 에러가 발생하였습니다. 빨리 확인 바랍니다.", e); // userId는 Long으로 변경안 될 수 없기 때문에 빨리 확인해야 함
             throw new CoreException(ErrorType.AUTHENTICATION_FAIL, e);
         }
         catch (Exception e) {
             throw new CoreException(ErrorType.AUTHENTICATION_FAIL);
+        }
+    }
+
+    @Override
+    public boolean validate(String token) {
+        try {
+            if(isTokenExpired(token)) {
+                log.debug("JWT 만료되었습니다.");
+                return false;
+            }
+
+            Jwts.parser().verifyWith(secretKey)
+                    .build()
+                    .parseSignedClaims(token);
+
+            return true;
+        } catch (Exception e) {
+            log.debug("JWT 검증에 실패했습니다.", e);
+            return false;
         }
     }
 
@@ -71,6 +90,6 @@ public class AccessTokenHandlerImpl implements AccessTokenHandler {
                 .getPayload()
                 .getExpiration();
 
-        return expiration.before(new Date());
+        return expiration.after(new Date());
     }
 }

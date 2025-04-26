@@ -2,9 +2,11 @@ package com.naribackend.core.auth;
 
 public interface AccessTokenHandler {
 
-    String createTokenBy(Long userId);
+    String createTokenBy(long userId);
 
-    Long getUserIdFrom(String token);
+    long getUserIdFrom(String token);
 
     boolean isTokenExpired(String token);
+
+    boolean validate(String token);
 }

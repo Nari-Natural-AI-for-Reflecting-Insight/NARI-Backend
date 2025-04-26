@@ -31,4 +31,10 @@ public class UserAccountEntityRepository implements UserAccountRepository {
         return userAccountJpaRepository.findByUserEmail(userEmail.getAddress())
                 .map(UserAccountEntity::toUserAccount);
     }
+
+    @Override
+    public Optional<UserAccount> findById(Long id) {
+        return userAccountJpaRepository.findById(id)
+                .map(UserAccountEntity::toUserAccount);
+    }
 }

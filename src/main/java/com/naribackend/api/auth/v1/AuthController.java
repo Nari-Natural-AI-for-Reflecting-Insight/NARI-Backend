@@ -5,15 +5,16 @@ import com.naribackend.api.auth.v1.request.CreateUserAccountRequest;
 import com.naribackend.api.auth.v1.request.GetAccessTokenRequest;
 import com.naribackend.api.auth.v1.request.SendVerificationCodeRequest;
 import com.naribackend.api.auth.v1.response.GetAccessTokenResponse;
+import com.naribackend.api.auth.v1.response.GetUserInfoResponse;
 import com.naribackend.core.auth.AuthService;
+import com.naribackend.core.auth.CurrentUser;
+import com.naribackend.core.auth.LoginUser;
+import com.naribackend.core.auth.UserAccount;
 import com.naribackend.support.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -75,5 +76,17 @@ public class AuthController {
         return ApiResponse.success(
                 new GetAccessTokenResponse(accessToken)
         );
+    }
+
+    @Operation(
+            summary = "사용자 정보 조회",
+            description = "사용자 정보를 조회합니다."
+    )
+    @GetMapping("/me")
+    public ApiResponse<?> getMe(@CurrentUser LoginUser loginUser) {
+        UserAccount currentUserAccount = authService.getUserAccountBy(loginUser);
+        GetUserInfoResponse loginUserInfo = GetUserInfoResponse.from(currentUserAccount);
+
+        return ApiResponse.success(loginUserInfo);
     }
 }

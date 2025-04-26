@@ -1,4 +1,4 @@
-package com.naribackend.security;
+package com.naribackend.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +24,8 @@ public class SecurityConfig {
                             "/api/v1/auth/email-verification-code",
                             "/api/v1/auth/email-verification-code/check",
                             "/api/v1/auth/sign-up",
-                            "/api/v1/auth/sign-in/access-token"
+                            "/api/v1/auth/sign-in/access-token",
+                            "/api/v1/auth/me"
                     ).permitAll()
                     .requestMatchers(
                             "/v3/api-docs/**",
@@ -43,7 +44,7 @@ public class SecurityConfig {
         config.setAllowedOrigins(
                 List.of(
                         "https://nari-web.com", "https://api.nari-web.com", "https://www.nari-web.com",
-                        "http://localhost:3000", "http://localhost:5173"
+                        "http://localhost:3000"
                 )
         );
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
