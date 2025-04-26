@@ -90,6 +90,6 @@ public class AccessTokenHandlerImpl implements AccessTokenHandler {
                 .getPayload()
                 .getExpiration();
 
-        return expiration.after(new Date());
+        return expiration.before(new Date());
     }
 }
