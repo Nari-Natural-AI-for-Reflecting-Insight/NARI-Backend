@@ -2,8 +2,14 @@ package com.naribackend.api.auth.v1;
 
 import com.naribackend.api.auth.v1.request.CheckVerificationCodeRequest;
 import com.naribackend.api.auth.v1.request.CreateUserAccountRequest;
+import com.naribackend.api.auth.v1.request.GetAccessTokenRequest;
 import com.naribackend.api.auth.v1.request.SendVerificationCodeRequest;
+import com.naribackend.api.auth.v1.response.GetAccessTokenResponse;
+import com.naribackend.api.auth.v1.response.GetUserInfoResponse;
 import com.naribackend.core.auth.AuthService;
+import com.naribackend.core.auth.CurrentUser;
+import com.naribackend.core.auth.LoginUser;
+import com.naribackend.core.auth.UserAccount;
 import com.naribackend.support.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -55,5 +61,32 @@ public class AuthController {
         authService.signUp(request.toUserEmail(), request.toRawUserPassword(), request.newNickname());
 
         return ApiResponse.success();
+    }
+
+    @Operation(
+            summary = "로그인",
+            description = "로그인을 하고 Access Token을 발급받습니다."
+    )
+    @PostMapping("/sign-in/access-token")
+    public ApiResponse<?> signIn(
+            @RequestBody @Valid final GetAccessTokenRequest request
+    ) {
+        String accessToken = authService.createAccessToken(request.toUserEmail(), request.toRawUserPassword());
+
+        return ApiResponse.success(
+                new GetAccessTokenResponse(accessToken)
+        );
+    }
+
+    @Operation(
+            summary = "사용자 정보 조회",
+            description = "사용자 정보를 조회합니다."
+    )
+    @GetMapping("/me")
+    public ApiResponse<?> getMe(@CurrentUser LoginUser loginUser) {
+        UserAccount currentUserAccount = authService.getUserAccountBy(loginUser);
+        GetUserInfoResponse loginUserInfo = GetUserInfoResponse.from(currentUserAccount);
+
+        return ApiResponse.success(loginUserInfo);
     }
 }

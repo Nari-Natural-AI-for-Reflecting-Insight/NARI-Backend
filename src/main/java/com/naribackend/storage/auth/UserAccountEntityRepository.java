@@ -6,6 +6,8 @@ import com.naribackend.core.email.UserEmail;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 @RequiredArgsConstructor
 public class UserAccountEntityRepository implements UserAccountRepository {
@@ -22,5 +24,17 @@ public class UserAccountEntityRepository implements UserAccountRepository {
     @Override
     public boolean existsByEmail(final UserEmail email) {
         return userAccountJpaRepository.existsByUserEmail(email.getAddress());
+    }
+
+    @Override
+    public Optional<UserAccount> findByEmail(UserEmail userEmail) {
+        return userAccountJpaRepository.findByUserEmail(userEmail.getAddress())
+                .map(UserAccountEntity::toUserAccount);
+    }
+
+    @Override
+    public Optional<UserAccount> findById(Long id) {
+        return userAccountJpaRepository.findById(id)
+                .map(UserAccountEntity::toUserAccount);
     }
 }

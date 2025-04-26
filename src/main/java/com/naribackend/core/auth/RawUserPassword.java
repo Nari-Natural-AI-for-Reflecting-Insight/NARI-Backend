@@ -26,7 +26,10 @@ public class RawUserPassword {
         return new RawUserPassword(raw);
     }
 
-    public void matches(final UserPasswordEncoder userPasswordEncoder, final EncodedUserPassword encodedUserPassword) {
+    public void matches(
+            final UserPasswordEncoder userPasswordEncoder,
+            final EncodedUserPassword encodedUserPassword
+    ) {
         if (!userPasswordEncoder.matches(raw, encodedUserPassword.getEncodedPassword())) {
             throw new CoreException(ErrorType.INVALID_PASSWORD);
         }
