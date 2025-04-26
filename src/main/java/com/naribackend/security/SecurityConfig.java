@@ -1,4 +1,4 @@
-package com.naribackend.config;
+package com.naribackend.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -43,7 +43,7 @@ public class SecurityConfig {
         config.setAllowedOrigins(
                 List.of(
                         "https://nari-web.com", "https://api.nari-web.com", "https://www.nari-web.com",
-                        "http://localhost:3000"
+                        "http://localhost:3000", "http://localhost:5173"
                 )
         );
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
