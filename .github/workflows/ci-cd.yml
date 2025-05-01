@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - ci-github-actions
+      - feat/11-log-append
   pull_request:
     branches: [ main ]
 
