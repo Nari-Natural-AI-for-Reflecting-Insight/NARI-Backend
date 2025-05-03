@@ -1,11 +1,14 @@
 FROM openjdk:17-jdk-slim
+
+RUN groupadd --system spring && useradd --system --create-home --gid spring spring
+RUN mkdir -p /var/log/app/spring && chown -R spring:spring /var/log/app/spring
+
 WORKDIR /app
 
 ARG JAR_FILE=build/libs/NARI-Backend-0.0.1-SNAPSHOT.jar
-COPY ${JAR_FILE} ./app.jar
+COPY --chown=spring:spring ${JAR_FILE} app.jar
 
-# 앱이 사용할 포트
+USER spring
+
 EXPOSE 8080
-
-# 컨테이너 시작 시 실행할 명령
-ENTRYPOINT ["java","-jar","/app/app.jar"]
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
