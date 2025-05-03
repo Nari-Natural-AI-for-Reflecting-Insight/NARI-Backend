@@ -19,5 +19,6 @@ docker run -d   --name nari-app -v /var/log/app/spring:/var/log/app/spring  -p 8
 현재 로그 설정대로 로그를 남기기 위해서는 아래의 명령어를 통해 로그 디렉토리를 생성해야 해요
 ```
 sudo mkdir -p /var/log/app/spring
-sudo chmod 777 /var/log/app/spring         
+sudo chown $USER:$USER /var/log/app/spring
+sudo chmod 750 /var/log/app/spring         
 ```
