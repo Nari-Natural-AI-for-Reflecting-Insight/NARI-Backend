@@ -1,0 +1,19 @@
+== 이메일 인증 코드 전송
+
+사용자의 이메일 주소로 인증 코드를 전송하는 API입니다.
+회원가입 등의 절차에서 사용됩니다.
+
+==== Request
+include::{snippets}/email-verification-code/http-request.adoc[]
+
+==== Request Fields
+
+include::{snippets}/email-verification-code/request-fields.adoc[]
+
+==== Response
+
+include::{snippets}/email-verification-code/http-response.adoc[]
+
+==== Response Fields
+
+include::{snippets}/email-verification-code/response-fields.adoc[]
