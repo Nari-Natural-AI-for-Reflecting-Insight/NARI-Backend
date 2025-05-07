@@ -31,7 +31,7 @@ public class RawUserPassword {
             final EncodedUserPassword encodedUserPassword
     ) {
         if (!userPasswordEncoder.matches(raw, encodedUserPassword.getEncodedPassword())) {
-            throw new CoreException(ErrorType.INVALID_PASSWORD);
+            throw new CoreException(ErrorType.AUTHENTICATION_FAIL);
         }
     }
 

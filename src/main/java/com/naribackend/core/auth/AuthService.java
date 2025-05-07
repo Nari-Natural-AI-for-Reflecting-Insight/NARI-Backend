@@ -81,7 +81,7 @@ public class AuthService {
 
     public String createAccessToken(final UserEmail userEmail, final RawUserPassword rawUserPassword) {
         UserAccount userAccount = userAccountRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_EMAIL));
+                .orElseThrow(() -> new CoreException(ErrorType.AUTHENTICATION_FAIL));
 
         rawUserPassword.matches(userPasswordEncoder, userAccount.getEncodedUserPassword());
 

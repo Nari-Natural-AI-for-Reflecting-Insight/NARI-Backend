@@ -10,6 +10,8 @@ import com.naribackend.core.auth.AuthService;
 import com.naribackend.core.auth.CurrentUser;
 import com.naribackend.core.auth.LoginUser;
 import com.naribackend.core.auth.UserAccount;
+import com.naribackend.support.error.CoreException;
+import com.naribackend.support.error.ErrorType;
 import com.naribackend.support.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -71,11 +73,12 @@ public class AuthController {
     public ApiResponse<?> signIn(
             @RequestBody @Valid final GetAccessTokenRequest request
     ) {
-        String accessToken = authService.createAccessToken(request.toUserEmail(), request.toRawUserPassword());
-
-        return ApiResponse.success(
-                new GetAccessTokenResponse(accessToken)
-        );
+        try {
+            String accessToken = authService.createAccessToken(request.toUserEmail(), request.toRawUserPassword());
+            return ApiResponse.success(new GetAccessTokenResponse(accessToken));
+        } catch (Exception e) {
+            throw new CoreException(ErrorType.AUTHENTICATION_FAIL);
+        }
     }
 
     @Operation(
