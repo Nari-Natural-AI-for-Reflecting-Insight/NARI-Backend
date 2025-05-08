@@ -70,7 +70,7 @@ public class AuthController {
             description = "로그인을 하고 Access Token을 발급받습니다."
     )
     @PostMapping("/sign-in/access-token")
-    public ApiResponse<?> signIn(
+    public ApiResponse<?> createAccessToken(
             @RequestBody @Valid final GetAccessTokenRequest request
     ) {
         try {
