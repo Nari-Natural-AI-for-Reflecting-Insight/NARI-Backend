@@ -1,6 +1,7 @@
 package com.naribackend.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.naribackend.api.auth.v1.request.CheckVerificationCodeRequest;
 import com.naribackend.api.auth.v1.request.CreateUserAccountRequest;
 import com.naribackend.api.auth.v1.request.GetAccessTokenRequest;
 import com.naribackend.api.auth.v1.request.SendVerificationCodeRequest;
@@ -383,6 +384,61 @@ class AuthIntegrationDocsTest {
                         ApiResponseDocs.ERROR_FIELDS()
                 ))
         );
+    }
+
+    @Test
+    @DisplayName("이메일 인증 코드 확인 성공 - 문서화")
+    void checkVerificationCode_success_docs() throws Exception {
+
+        // given
+        SendVerificationCodeRequest request = new SendVerificationCodeRequest("user@example.com");
+        authService.processVerificationCode(request.toUserEmail());
+
+        EmailVerification emailVerification = emailVerificationRepository.findByUserEmail(request.toUserEmail())
+                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_EMAIL));
+
+        VerificationCode verificationCode = emailVerification.getVerificationCode();
+
+        // when & then
+        mockMvc.perform(
+                RestDocumentationRequestBuilders.post("/api/v1/auth/email-verification-code/check")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(
+                                new CheckVerificationCodeRequest(request.toEmail(), verificationCode.toString()))
+                        )
+        ).andExpect(status().isOk())
+        .andDo(document("email-verification-code-check",
+                requestFields(
+                        fieldWithPath("targetEmail").description("인증 코드를 확인할 이메일 주소"),
+                        fieldWithPath("verificationCode").description("인증 코드")
+                ),
+                responseFields(
+                        ApiResponseDocs.SUCCESS_FIELDS()
+                ))
+        );
+    }
+
+    @Test
+    @DisplayName("이메일 인증 코드 검증 실패 - 잘못된 인증 코드")
+    void checkVerificationCode_fail_invalid_verification_cde() throws Exception {
+
+        // given
+        SendVerificationCodeRequest request = new SendVerificationCodeRequest("user@example.com");
+        authService.processVerificationCode(request.toUserEmail());
+
+        // when & then
+        mockMvc.perform(
+                        RestDocumentationRequestBuilders.post("/api/v1/auth/email-verification-code/check")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(
+                                        new CheckVerificationCodeRequest(request.toEmail(), "invalid_code"))
+                                )
+                ).andExpect(status().is4xxClientError())
+                .andDo(document("email-verification-code-check",
+                        responseFields(
+                                ApiResponseDocs.ERROR_FIELDS()
+                        ))
+                );
     }
 
 }
