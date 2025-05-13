@@ -1,19 +1,18 @@
-# src/test/resources/application-test.yaml  ⟶  Spring Boot 3.x 전용
 spring:
   datasource:
-    driver-class-name: org.h2.Driver  # H2 드라이버
+    driver-class-name: org.h2.Driver
     url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    username: sa        # H2 기본 계정
+    username: sa
     password:
   jpa:
     hibernate:
-      ddl-auto: create-drop          # ↘︎ 테스트마다 스키마 생성→종료 시 삭제
-    database-platform: org.hibernate.dialect.PostgreSQLDialect  # SQL 방언 강제
-    open-in-view: false              # 필요 없으면 끄기
-    show-sql: false                   # 콘솔에 SQL 출력(선택)
+      ddl-auto: create
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
+    show-sql: false
     properties:
-      hibernate.format_sql: true     # SQL pretty‑print
+      hibernate.format_sql: true
   h2:
     console:
       enabled: true
-      path: /h2-console              # 브라우저에서 확인용
+      path: /h2-console

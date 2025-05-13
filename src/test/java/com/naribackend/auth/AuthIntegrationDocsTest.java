@@ -1,38 +1,39 @@
 package com.naribackend.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.naribackend.api.auth.CurrentUserArgumentResolver;
+import com.naribackend.api.auth.v1.request.CreateUserAccountRequest;
 import com.naribackend.api.auth.v1.request.GetAccessTokenRequest;
 import com.naribackend.api.auth.v1.request.SendVerificationCodeRequest;
 import com.naribackend.core.auth.*;
+import com.naribackend.core.email.EmailSender;
 import com.naribackend.core.email.UserEmail;
-import com.naribackend.infra.auth.AccessTokenHandlerImpl;
 import com.naribackend.support.ApiResponseDocs;
+import com.naribackend.support.error.CoreException;
+import com.naribackend.support.error.ErrorType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
+@ActiveProfiles("test")
+@Transactional
 @SpringBootTest
 @AutoConfigureRestDocs
-@AutoConfigureMockMvc(addFilters = false)
-@Import({
-        AccessTokenHandlerImpl.class,
-        CurrentUserArgumentResolver.class
-})
+@AutoConfigureMockMvc
 class AuthIntegrationDocsTest {
 
     @Autowired
@@ -42,20 +43,28 @@ class AuthIntegrationDocsTest {
     ObjectMapper objectMapper;
 
     @Autowired
-    AuthService authService;
-
-    @Autowired
     UserAccountAppender userAccountAppender;
 
     @Autowired
     UserPasswordEncoder userPasswordEncoder;
+
+    @Autowired
+    EmailVerificationAppender emailVerificationAppender;
+
+    @Autowired
+    EmailVerificationModifier emailVerificationModifier;
+
+    @Autowired
+    EmailVerificationRepository emailVerificationRepository;
+
+    @MockitoBean
+    EmailSender emailSender;
 
     @Test
     @DisplayName("이메일 인증 코드 발송 API 성공 - 문서화")
     void sendVerificationCode_success_docs() throws Exception {
         // given
         SendVerificationCodeRequest request = new SendVerificationCodeRequest("user@example.com");
-        doNothing().when(authService).processVerificationCode(request.toUserEmail());
 
         // when & then
         mockMvc.perform(
@@ -71,6 +80,9 @@ class AuthIntegrationDocsTest {
                                 ApiResponseDocs.SUCCESS_FIELDS()
                         ))
                 );
+
+        // verify
+        verify(emailSender, times(1)).sendEmail(any());
     }
 
     @Test
@@ -81,22 +93,22 @@ class AuthIntegrationDocsTest {
 
         // when & then
         mockMvc.perform(
-                        RestDocumentationRequestBuilders.post("/api/v1/auth/email-verification-code")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andDo(document("email-verification-code-invalid-email",
-                        requestFields(
-                                fieldWithPath("toEmail").description("인증 코드를 받을 이메일 주소")
-                        ),
-                        responseFields(
-                                ApiResponseDocs.ERROR_FIELDS()
-                        ))
-                );
+                RestDocumentationRequestBuilders.post("/api/v1/auth/email-verification-code")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request))
+        )
+        .andExpect(status().isBadRequest())
+        .andDo(document("email-verification-code-invalid-email",
+            requestFields(
+                    fieldWithPath("toEmail").description("인증 코드를 받을 이메일 주소")
+            ),
+            responseFields(
+                    ApiResponseDocs.ERROR_FIELDS()
+            ))
+        );
     }
 
     @Test
-    @Transactional
     @DisplayName("access token 발급 API 성공 - 문서화")
     void createAccessToken_success_docs() throws Exception {
 
@@ -114,29 +126,28 @@ class AuthIntegrationDocsTest {
 
         // when & then
         mockMvc.perform(
-                        RestDocumentationRequestBuilders.post("/api/v1/auth/sign-in/access-token")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(
-                                        new GetAccessTokenRequest(userEmail.getAddress(), password))
-                                )
+                RestDocumentationRequestBuilders.post("/api/v1/auth/sign-in/access-token")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(
+                            new GetAccessTokenRequest(userEmail.getAddress(), password))
                 )
-                .andExpect(status().isOk())
-                .andDo(document("access-token",
-                        requestFields(
-                                fieldWithPath("email").description("이메일"),
-                                fieldWithPath("password").description("비밀번호")
-                        ),
-                        responseFields(
-                                ApiResponseDocs.SUCCESS_FIELDS(
-                                        fieldWithPath("data.accessToken").description("발급된 Access Token")
-                                )
-                        ))
-                );
+        )
+        .andExpect(status().isOk())
+        .andDo(document("access-token",
+            requestFields(
+                    fieldWithPath("email").description("이메일"),
+                    fieldWithPath("password").description("비밀번호")
+            ),
+            responseFields(
+                    ApiResponseDocs.SUCCESS_FIELDS(
+                            fieldWithPath("data.accessToken").description("발급된 Access Token")
+                    )
+            ))
+        );
 
     }
 
     @Test
-    @Transactional
     @DisplayName("access token 발급 API 실패 - 잘 못된 비밀번호")
     void createAccessToken_fail_invalid_password() throws Exception {
 
@@ -154,23 +165,129 @@ class AuthIntegrationDocsTest {
 
         // when & then
         mockMvc.perform(
-                        RestDocumentationRequestBuilders.post("/api/v1/auth/sign-in/access-token")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(
-                                        new GetAccessTokenRequest(userEmail.getAddress(), "this_is_invalid_password"))
-                                )
-                )
-                .andExpect(status().isBadRequest())
-                .andDo(document("access-token",
-                        requestFields(
-                                fieldWithPath("email").description("이메일"),
-                                fieldWithPath("password").description("비밀번호")
-                        ),
-                        responseFields(
-                                ApiResponseDocs.ERROR_FIELDS()
-                        ))
-                );
+                RestDocumentationRequestBuilders.post("/api/v1/auth/sign-in/access-token")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(
+                        new GetAccessTokenRequest(userEmail.getAddress(), "this_is_invalid_password"))
+                    )
+        )
+        .andExpect(status().isBadRequest())
+        .andDo(document("access-token",
+                requestFields(
+                    fieldWithPath("email").description("이메일"),
+                    fieldWithPath("password").description("비밀번호")
+                ),
+                responseFields(
+                    ApiResponseDocs.ERROR_FIELDS()
+                ))
+        );
 
     }
 
+    @Test
+    @DisplayName("회원가입 API 성공 - 문서화")
+    void signup_success_docs() throws Exception {
+
+        // given
+        String newEmail = "user1234@example.com";
+        String newPassword = "password1234";
+        String newNickname = "nickname";
+
+        UserEmail newUserEmail = UserEmail.from(newEmail);
+
+        final VerificationCode verificationCode = VerificationCode.generateSixDigitCode();
+        emailVerificationAppender.appendEmailVerification(newUserEmail, verificationCode);
+
+        final EmailVerification savedEmailVerification = emailVerificationRepository.findByUserEmail(newUserEmail)
+                .orElseThrow(
+                        () -> new CoreException(ErrorType.NOT_FOUND_EMAIL)
+                );
+        emailVerificationModifier.modifyAsVerified(savedEmailVerification);
+
+        // when & then
+        mockMvc.perform(
+                RestDocumentationRequestBuilders.post("/api/v1/auth/sign-up")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(
+                            new CreateUserAccountRequest(newEmail, newPassword, newNickname))
+                    )
+        )
+        .andExpect(status().isOk())
+        .andDo(document("sign-up",
+                requestFields(
+                    fieldWithPath("newUserEmail").description("회원가입할 이메일"),
+                    fieldWithPath("newPassword").description("회원가입할 비밀번호"),
+                    fieldWithPath("newNickname").description("회원가입할 닉네임")
+                ),
+                responseFields(
+                    ApiResponseDocs.SUCCESS_FIELDS()
+                ))
+        );
+    }
+
+    @Test
+    @DisplayName("회원가입 API 실패 - 인증 되지 않는 이메일")
+    void signup_fail_not_verified_email() throws Exception {
+
+        // given
+        String newEmail = "user1234@example.com";
+        String newPassword = "password1234";
+        String newNickname = "nickname";
+
+        UserEmail newUserEmail = UserEmail.from(newEmail);
+
+        final VerificationCode verificationCode = VerificationCode.generateSixDigitCode();
+        emailVerificationAppender.appendEmailVerification(newUserEmail, verificationCode);
+
+        // when & then
+        mockMvc.perform(
+            RestDocumentationRequestBuilders.post("/api/v1/auth/sign-up")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(
+                    new CreateUserAccountRequest(newEmail, newPassword, newNickname))
+                )
+        )
+        .andExpect(status().is4xxClientError())
+        .andDo(document("sign-up",
+            requestFields(
+                fieldWithPath("newUserEmail").description("회원가입할 이메일"),
+                fieldWithPath("newPassword").description("회원가입할 비밀번호"),
+                fieldWithPath("newNickname").description("회원가입할 닉네임")
+            ),
+            responseFields(
+                ApiResponseDocs.ERROR_FIELDS()
+            ))
+        );
+    }
+
+    @Test
+    @DisplayName("회원가입 API 실패 - 인증 요청이 없는 이메일")
+    void signup_fail_not_send_verification_email() throws Exception {
+
+        // given
+        String newEmail = "user1234@example.com";
+        String newPassword = "password1234";
+        String newNickname = "nickname";
+
+        // when & then
+        mockMvc.perform(
+            RestDocumentationRequestBuilders.post("/api/v1/auth/sign-up")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(
+                        new CreateUserAccountRequest(newEmail, newPassword, newNickname)
+                )
+            )
+        )
+        .andExpect(status().is4xxClientError())
+        .andDo(document("sign-up",
+            requestFields(
+                fieldWithPath("newUserEmail").description("회원가입할 이메일"),
+                fieldWithPath("newPassword").description("회원가입할 비밀번호"),
+                fieldWithPath("newNickname").description("회원가입할 닉네임")
+            ),
+            responseFields(
+                ApiResponseDocs.ERROR_FIELDS()
+            ))
+        );
+    }
 }
