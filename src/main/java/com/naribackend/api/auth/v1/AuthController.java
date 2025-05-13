@@ -14,6 +14,7 @@ import com.naribackend.support.error.CoreException;
 import com.naribackend.support.error.ErrorType;
 import com.naribackend.support.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -86,7 +87,9 @@ public class AuthController {
             description = "사용자 정보를 조회합니다."
     )
     @GetMapping("/me")
-    public ApiResponse<?> getMe(@CurrentUser LoginUser loginUser) {
+    public ApiResponse<?> getMe(
+            @Parameter(hidden = true) @CurrentUser LoginUser loginUser
+    ) {
         UserAccount currentUserAccount = authService.getUserAccountBy(loginUser);
         GetUserInfoResponse loginUserInfo = GetUserInfoResponse.from(currentUserAccount);
 

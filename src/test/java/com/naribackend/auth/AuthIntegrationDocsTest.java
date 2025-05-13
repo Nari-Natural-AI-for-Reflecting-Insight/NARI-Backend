@@ -7,6 +7,7 @@ import com.naribackend.api.auth.v1.request.SendVerificationCodeRequest;
 import com.naribackend.core.auth.*;
 import com.naribackend.core.email.EmailSender;
 import com.naribackend.core.email.UserEmail;
+import com.naribackend.infra.auth.AccessTokenHandlerImpl;
 import com.naribackend.support.ApiResponseDocs;
 import com.naribackend.support.error.CoreException;
 import com.naribackend.support.error.ErrorType;
@@ -56,6 +57,9 @@ class AuthIntegrationDocsTest {
 
     @Autowired
     EmailVerificationRepository emailVerificationRepository;
+
+    @Autowired
+    AuthService authService;
 
     @MockitoBean
     EmailSender emailSender;
@@ -290,4 +294,95 @@ class AuthIntegrationDocsTest {
             ))
         );
     }
+
+    @Test
+    @DisplayName("사용자 정보 조회 성공 - 문서화")
+    void getMe_success_docs() throws Exception {
+
+        // given
+        UserEmail userEmail = UserEmail.from("user1234@example.com");
+        String password = "password1234";
+        RawUserPassword userPassword = RawUserPassword.from(password);
+        EncodedUserPassword encodedPassword = userPassword.encode(userPasswordEncoder);
+
+        userAccountAppender.appendUserAccount(
+                userEmail,
+                encodedPassword,
+                "nickname"
+        );
+
+        String accessToken = authService.createAccessToken(userEmail, userPassword);
+
+        // when & then
+        mockMvc.perform(
+            RestDocumentationRequestBuilders.get("/api/v1/auth/me")
+                    .header("Authorization", "Bearer " + accessToken)
+                    .contentType(MediaType.APPLICATION_JSON)
+        )
+        .andExpect(status().isOk())
+        .andDo(document("get-me",
+                responseFields(
+                        ApiResponseDocs.SUCCESS_FIELDS(
+                                fieldWithPath("data.id").description("사용자 계정 테이블의 primary key"),
+                                fieldWithPath("data.email").description("이메일"),
+                                fieldWithPath("data.nickname").description("닉네임")
+                        )
+                ))
+        );
+
+    }
+
+    @Test
+    @DisplayName("사용자 정보 조회 실패 - 만료된 access token")
+    void getMe_fail_expire_token() throws Exception {
+
+        // given
+        UserEmail userEmail = UserEmail.from("user1234@example.com");
+        String password = "password1234";
+        RawUserPassword userPassword = RawUserPassword.from(password);
+        EncodedUserPassword encodedPassword = userPassword.encode(userPasswordEncoder);
+
+        userAccountAppender.appendUserAccount(
+                userEmail,
+                encodedPassword,
+                "nickname"
+        );
+
+        AccessTokenHandlerImpl accessTokenHandler = new AccessTokenHandlerImpl("secretsecretsecretsecretsecretsecretsecretsecret", 0L);
+
+        // when & then
+        mockMvc.perform(
+                RestDocumentationRequestBuilders.get("/api/v1/auth/me")
+                        .header("Authorization", "Bearer " + accessTokenHandler.createTokenBy(1L))
+                        .contentType(MediaType.APPLICATION_JSON)
+        )
+        .andExpect(status().is4xxClientError())
+        .andDo(document("get-me",
+                responseFields(
+                        ApiResponseDocs.ERROR_FIELDS()
+                ))
+        );
+    }
+
+    @Test
+    @DisplayName("사용자 정보 조회 실패 - signature 가 잘못된 access token")
+    void getMe_fail_signature_invalid() throws Exception {
+
+        // given
+        String invalidSignature = "invalid_signature";
+
+        // when & then
+        mockMvc.perform(
+                RestDocumentationRequestBuilders.get("/api/v1/auth/me")
+                        .header("Authorization", "Bearer " + invalidSignature)
+                        .contentType(MediaType.APPLICATION_JSON)
+        )
+        .andExpect(status().is4xxClientError())
+        .andDo(document("get-me",
+                responseFields(
+                        ApiResponseDocs.ERROR_FIELDS()
+                ))
+        );
+    }
+
 }
