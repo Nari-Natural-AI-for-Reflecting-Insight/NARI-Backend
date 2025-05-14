@@ -10,8 +10,11 @@ import com.naribackend.core.auth.AuthService;
 import com.naribackend.core.auth.CurrentUser;
 import com.naribackend.core.auth.LoginUser;
 import com.naribackend.core.auth.UserAccount;
+import com.naribackend.support.error.CoreException;
+import com.naribackend.support.error.ErrorType;
 import com.naribackend.support.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -68,14 +71,15 @@ public class AuthController {
             description = "로그인을 하고 Access Token을 발급받습니다."
     )
     @PostMapping("/sign-in/access-token")
-    public ApiResponse<?> signIn(
+    public ApiResponse<?> createAccessToken(
             @RequestBody @Valid final GetAccessTokenRequest request
     ) {
-        String accessToken = authService.createAccessToken(request.toUserEmail(), request.toRawUserPassword());
-
-        return ApiResponse.success(
-                new GetAccessTokenResponse(accessToken)
-        );
+        try {
+            String accessToken = authService.createAccessToken(request.toUserEmail(), request.toRawUserPassword());
+            return ApiResponse.success(new GetAccessTokenResponse(accessToken));
+        } catch (Exception e) {
+            throw new CoreException(ErrorType.AUTHENTICATION_FAIL);
+        }
     }
 
     @Operation(
@@ -83,7 +87,9 @@ public class AuthController {
             description = "사용자 정보를 조회합니다."
     )
     @GetMapping("/me")
-    public ApiResponse<?> getMe(@CurrentUser LoginUser loginUser) {
+    public ApiResponse<?> getMe(
+            @Parameter(hidden = true) @CurrentUser LoginUser loginUser
+    ) {
         UserAccount currentUserAccount = authService.getUserAccountBy(loginUser);
         GetUserInfoResponse loginUserInfo = GetUserInfoResponse.from(currentUserAccount);
 
