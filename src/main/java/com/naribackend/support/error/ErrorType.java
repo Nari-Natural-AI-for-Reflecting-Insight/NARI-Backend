@@ -19,7 +19,8 @@ public enum ErrorType {
     NOT_VERIFIED_EMAIL(HttpStatus.BAD_REQUEST, ErrorCode.E400, "인증이 되지 않은 이메일 입니다.", LogLevel.DEBUG),
     ALREADY_SIGNED_EMAIL(HttpStatus.BAD_REQUEST, ErrorCode.E400, "이미 가입된 이메일입니다.", LogLevel.DEBUG),
     AUTHENTICATION_FAIL(HttpStatus.BAD_REQUEST, ErrorCode.E400, "인증에 실패 하였습니다.", LogLevel.DEBUG),
-    BIND_EXCEPTION(HttpStatus.BAD_REQUEST, ErrorCode.E400, "입력 형식이 올바르지 않습니다.", LogLevel.DEBUG)
+    BIND_EXCEPTION(HttpStatus.BAD_REQUEST, ErrorCode.E400, "입력 형식이 올바르지 않습니다.", LogLevel.DEBUG),
+    EXPIRED_VERIFICATION_CODE(HttpStatus.BAD_REQUEST, ErrorCode.E400, "인증 코드가 만료되었습니다.", LogLevel.DEBUG),
     ;
 
     private final HttpStatus status;
