@@ -1,10 +1,10 @@
 package com.naribackend.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.naribackend.api.auth.v1.request.CheckVerificationCodeRequest;
-import com.naribackend.api.auth.v1.request.CreateUserAccountRequest;
-import com.naribackend.api.auth.v1.request.GetAccessTokenRequest;
-import com.naribackend.api.auth.v1.request.SendVerificationCodeRequest;
+import com.naribackend.api.v1.auth.request.CheckVerificationCodeRequest;
+import com.naribackend.api.v1.auth.request.CreateUserAccountRequest;
+import com.naribackend.api.v1.auth.request.GetAccessTokenRequest;
+import com.naribackend.api.v1.auth.request.SendVerificationCodeRequest;
 import com.naribackend.core.auth.*;
 import com.naribackend.core.email.EmailSender;
 import com.naribackend.core.email.UserEmail;

@@ -1,11 +1,11 @@
-package com.naribackend.api.auth.v1;
+package com.naribackend.api.v1.auth;
 
-import com.naribackend.api.auth.v1.request.CheckVerificationCodeRequest;
-import com.naribackend.api.auth.v1.request.CreateUserAccountRequest;
-import com.naribackend.api.auth.v1.request.GetAccessTokenRequest;
-import com.naribackend.api.auth.v1.request.SendVerificationCodeRequest;
-import com.naribackend.api.auth.v1.response.GetAccessTokenResponse;
-import com.naribackend.api.auth.v1.response.GetUserInfoResponse;
+import com.naribackend.api.v1.auth.request.CheckVerificationCodeRequest;
+import com.naribackend.api.v1.auth.request.CreateUserAccountRequest;
+import com.naribackend.api.v1.auth.request.GetAccessTokenRequest;
+import com.naribackend.api.v1.auth.request.SendVerificationCodeRequest;
+import com.naribackend.api.v1.auth.response.GetAccessTokenResponse;
+import com.naribackend.api.v1.auth.response.GetUserInfoResponse;
 import com.naribackend.core.auth.AuthService;
 import com.naribackend.core.auth.CurrentUser;
 import com.naribackend.core.auth.LoginUser;
