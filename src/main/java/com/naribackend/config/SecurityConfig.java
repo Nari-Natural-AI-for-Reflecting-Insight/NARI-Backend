@@ -44,7 +44,8 @@ public class SecurityConfig {
         config.setAllowedOrigins(
                 List.of(
                         "https://nari-web.com", "https://api.nari-web.com", "https://www.nari-web.com",
-                        "http://localhost:3000", "http://localhost:5173"
+                        "http://localhost:3000", "http://localhost:5173", "https://api-dev.nari-web.com",
+                        "https://api-staging.nari-web.com"
                 )
         );
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
