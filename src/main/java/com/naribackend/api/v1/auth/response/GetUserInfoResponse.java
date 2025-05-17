@@ -1,4 +1,4 @@
-package com.naribackend.api.auth.v1.response;
+package com.naribackend.api.v1.auth.response;
 
 import com.naribackend.core.auth.UserAccount;
 import lombok.Builder;

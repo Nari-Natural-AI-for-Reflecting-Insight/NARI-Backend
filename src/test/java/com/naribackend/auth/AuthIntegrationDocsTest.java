@@ -1,10 +1,11 @@
 package com.naribackend.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.naribackend.api.auth.v1.request.CheckVerificationCodeRequest;
-import com.naribackend.api.auth.v1.request.CreateUserAccountRequest;
-import com.naribackend.api.auth.v1.request.GetAccessTokenRequest;
-import com.naribackend.api.auth.v1.request.SendVerificationCodeRequest;
+import com.naribackend.api.v1.auth.request.CheckVerificationCodeRequest;
+import com.naribackend.api.v1.auth.request.CreateUserAccountRequest;
+import com.naribackend.api.v1.auth.request.GetAccessTokenRequest;
+import com.naribackend.api.v1.auth.request.SendVerificationCodeRequest;
+import com.naribackend.core.DateTimeProvider;
 import com.naribackend.core.auth.*;
 import com.naribackend.core.email.EmailSender;
 import com.naribackend.core.email.UserEmail;
@@ -24,6 +25,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -61,6 +64,9 @@ class AuthIntegrationDocsTest {
 
     @Autowired
     AuthService authService;
+
+    @MockitoBean
+    DateTimeProvider dateTimeProvider;
 
     @MockitoBean
     EmailSender emailSender;
@@ -399,6 +405,9 @@ class AuthIntegrationDocsTest {
 
         VerificationCode verificationCode = emailVerification.getVerificationCode();
 
+        LocalDateTime verificationArrivalTime = LocalDateTime.now().plusMinutes(1);
+        when(dateTimeProvider.getCurrentDateTime()).thenReturn(verificationArrivalTime);
+
         // when & then
         mockMvc.perform(
                 RestDocumentationRequestBuilders.post("/api/v1/auth/email-verification-code/check")
@@ -426,6 +435,9 @@ class AuthIntegrationDocsTest {
         SendVerificationCodeRequest request = new SendVerificationCodeRequest("user@example.com");
         authService.processVerificationCode(request.toUserEmail());
 
+        LocalDateTime verificationArrivalTime = LocalDateTime.now().plusMinutes(1);
+        when(dateTimeProvider.getCurrentDateTime()).thenReturn(verificationArrivalTime);
+
         // when & then
         mockMvc.perform(
                         RestDocumentationRequestBuilders.post("/api/v1/auth/email-verification-code/check")
@@ -441,4 +453,37 @@ class AuthIntegrationDocsTest {
                 );
     }
 
+
+    @Test
+    @DisplayName("이메일 인증 코드 검증 실패 - 만료된 인증 코드")
+    void checkVerificationCode_fail_expire_token() throws Exception {
+
+        // given
+        LocalDateTime verificationArrivalTime = LocalDateTime.now().plusMinutes(6);
+
+        SendVerificationCodeRequest request = new SendVerificationCodeRequest("user@example.com");
+        authService.processVerificationCode(request.toUserEmail());
+
+        EmailVerification emailVerification = emailVerificationRepository.findByUserEmail(request.toUserEmail())
+                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_EMAIL));
+
+        VerificationCode verificationCode = emailVerification.getVerificationCode();
+
+        when(dateTimeProvider.getCurrentDateTime()).thenReturn(verificationArrivalTime);
+
+        // when & then
+        mockMvc.perform(
+                        RestDocumentationRequestBuilders.post("/api/v1/auth/email-verification-code/check")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(
+                                        new CheckVerificationCodeRequest(request.toEmail(), verificationCode.toString()))
+                                )
+                ).andExpect(status().is4xxClientError())
+                .andDo(document("email-verification-code-check",
+                        responseFields(
+                                ApiResponseDocs.ERROR_FIELDS()
+                        ))
+                );
+
+    }
 }

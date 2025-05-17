@@ -1,4 +1,4 @@
-package com.naribackend.api.auth.v1.request;
+package com.naribackend.api.v1.auth.request;
 
 import com.naribackend.core.auth.RawUserPassword;
 import com.naribackend.core.email.UserEmail;

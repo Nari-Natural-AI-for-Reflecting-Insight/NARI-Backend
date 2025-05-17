@@ -46,6 +46,7 @@ public class EmailVerificationEntity extends BaseEntity {
                 .userEmail(UserEmail.from(userEmail))
                 .verificationCode(VerificationCode.from(verificationCode))
                 .isVerified(isVerified)
+                .modifiedAt(this.getModifiedAt())
                 .build();
     }
 }

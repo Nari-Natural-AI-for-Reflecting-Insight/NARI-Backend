@@ -1,5 +1,6 @@
 package com.naribackend.core.auth;
 
+import com.naribackend.core.DateTimeProvider;
 import com.naribackend.core.email.EmailMessage;
 import com.naribackend.core.email.EmailSender;
 import com.naribackend.core.email.UserEmail;
@@ -7,6 +8,8 @@ import com.naribackend.support.error.CoreException;
 import com.naribackend.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +28,10 @@ public class AuthService {
     private final UserAccountRepository userAccountRepository;
 
     private final AccessTokenHandler accessTokenHandler;
+
+    private final DateTimeProvider dateTimeProvider;
+
+    private final static long EMAIL_VERIFICATION_TTL = 60 * 5;
 
     public void processVerificationCode(final UserEmail toUserEmail) {
         final VerificationCode verificationCode = VerificationCode.generateSixDigitCode();
@@ -46,10 +53,16 @@ public class AuthService {
             final UserEmail targetEmail,
             final VerificationCode verificationCode
     ) {
+        LocalDateTime verificationArrivalTime = dateTimeProvider.getCurrentDateTime();
+
         final EmailVerification savedEmailVerification = emailVerificationRepository.findByUserEmail(targetEmail)
                 .orElseThrow(
                         () -> new CoreException(ErrorType.NOT_FOUND_EMAIL)
                 );
+
+        if (savedEmailVerification.secondsSinceModified(verificationArrivalTime) > EMAIL_VERIFICATION_TTL) {
+            throw new CoreException(ErrorType.EXPIRED_VERIFICATION_CODE);
+        }
 
         if (!savedEmailVerification.isSameVerificationCode(verificationCode)) {
             throw new CoreException(ErrorType.INVALID_VERIFICATION_CODE);

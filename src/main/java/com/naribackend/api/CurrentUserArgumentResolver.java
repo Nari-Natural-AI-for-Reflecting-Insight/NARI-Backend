@@ -1,4 +1,4 @@
-package com.naribackend.api.auth;
+package com.naribackend.api;
 
 import com.naribackend.core.auth.AccessTokenHandler;
 import com.naribackend.core.auth.CurrentUser;
