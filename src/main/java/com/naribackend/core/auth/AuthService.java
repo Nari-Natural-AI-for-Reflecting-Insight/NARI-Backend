@@ -1,5 +1,6 @@
 package com.naribackend.core.auth;
 
+import com.naribackend.core.DateTimeProvider;
 import com.naribackend.core.email.EmailMessage;
 import com.naribackend.core.email.EmailSender;
 import com.naribackend.core.email.UserEmail;
@@ -28,6 +29,8 @@ public class AuthService {
 
     private final AccessTokenHandler accessTokenHandler;
 
+    private final DateTimeProvider dateTimeProvider;
+
     private final static long EMAIL_VERIFICATION_TTL = 60 * 5;
 
     public void processVerificationCode(final UserEmail toUserEmail) {
@@ -50,7 +53,7 @@ public class AuthService {
             final UserEmail targetEmail,
             final VerificationCode verificationCode
     ) {
-        final LocalDateTime verificationArrivalTime = LocalDateTime.now();
+        LocalDateTime verificationArrivalTime = dateTimeProvider.getCurrentDateTime();
 
         final EmailVerification savedEmailVerification = emailVerificationRepository.findByUserEmail(targetEmail)
                 .orElseThrow(
