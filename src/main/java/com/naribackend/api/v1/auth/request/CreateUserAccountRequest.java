@@ -31,7 +31,7 @@ public record CreateUserAccountRequest (
         return RawUserPassword.from(newPassword);
     }
 
-    public UserNickname toNickName() {
+    public UserNickname toNickname() {
         return UserNickname.from(newNickname);
     }
 }

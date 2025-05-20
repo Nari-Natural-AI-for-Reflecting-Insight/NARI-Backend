@@ -61,7 +61,7 @@ public class AuthController {
     public ApiResponse<?> signUp(
             @RequestBody @Valid final CreateUserAccountRequest request
     ) {
-        authService.signUp(request.toUserEmail(), request.toRawUserPassword(), request.toNickName());
+        authService.signUp(request.toUserEmail(), request.toRawUserPassword(), request.toNickname());
 
         return ApiResponse.success();
     }
