@@ -74,7 +74,7 @@ public class AuthService {
     public void signUp(
             final UserEmail newUserEmail,
             final RawUserPassword newRawUserPassword,
-            final String newNickname
+            final UserNickname newNickname
     ) {
         if(!emailVerificationReader.isVerified(newUserEmail)) {
             throw new CoreException(ErrorType.NOT_VERIFIED_EMAIL);

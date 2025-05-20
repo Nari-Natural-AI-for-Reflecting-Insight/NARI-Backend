@@ -13,7 +13,7 @@ public class UserAccountAppender {
     public void appendUserAccount(
             final UserEmail newUserEmail,
             final EncodedUserPassword newEncodedUserPassword,
-            final String newNickname
+            final UserNickname newNickname
     ) {
         UserAccount newUserAccount = UserAccount.builder()
                 .email(newUserEmail)

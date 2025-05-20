@@ -12,7 +12,7 @@ public record GetUserInfoResponse (
     public static GetUserInfoResponse from(UserAccount currentUserAccount) {
         return GetUserInfoResponse.builder()
                 .id(currentUserAccount.getId())
-                .nickname(currentUserAccount.getNickname())
+                .nickname(currentUserAccount.getNickname().getNickname())
                 .email(currentUserAccount.getEmail().getAddress())
                 .build();
     }

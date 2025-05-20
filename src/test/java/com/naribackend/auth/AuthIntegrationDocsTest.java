@@ -21,6 +21,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
+import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -132,7 +133,7 @@ class AuthIntegrationDocsTest {
         userAccountAppender.appendUserAccount(
                 userEmail,
                 encodedPassword,
-                "nickname"
+                UserNickname.from("nickname")
         );
 
         // when & then
@@ -171,7 +172,7 @@ class AuthIntegrationDocsTest {
         userAccountAppender.appendUserAccount(
                 userEmail,
                 encodedPassword,
-                "nickname"
+                UserNickname.from("nickname")
         );
 
         // when & then
@@ -228,7 +229,10 @@ class AuthIntegrationDocsTest {
                 requestFields(
                     fieldWithPath("newUserEmail").description("회원가입할 이메일"),
                     fieldWithPath("newPassword").description("회원가입할 비밀번호"),
-                    fieldWithPath("newNickname").description("회원가입할 닉네임")
+                    fieldWithPath("newNickname")
+                        .optional()
+                        .type(JsonFieldType.STRING)
+                        .description("회원가입할 닉네임(선택)")
                 ),
                 responseFields(
                     ApiResponseDocs.SUCCESS_FIELDS()
@@ -315,7 +319,7 @@ class AuthIntegrationDocsTest {
         userAccountAppender.appendUserAccount(
                 userEmail,
                 encodedPassword,
-                "nickname"
+                UserNickname.from("nickname")
         );
 
         String accessToken = authService.createAccessToken(userEmail, userPassword);
@@ -352,7 +356,7 @@ class AuthIntegrationDocsTest {
         userAccountAppender.appendUserAccount(
                 userEmail,
                 encodedPassword,
-                "nickname"
+                UserNickname.from("nickname")
         );
 
         AccessTokenHandlerImpl accessTokenHandler = new AccessTokenHandlerImpl("secretsecretsecretsecretsecretsecretsecretsecret", 0L);
