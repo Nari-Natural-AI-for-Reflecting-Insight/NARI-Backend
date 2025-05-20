@@ -9,7 +9,7 @@ import lombok.Getter;
 public class UserAccount {
     private final Long id;
 
-    private final String nickname;
+    private final UserNickname nickname;
 
     private final EncodedUserPassword encodedUserPassword;
 

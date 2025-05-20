@@ -2,6 +2,7 @@ package com.naribackend.storage.auth;
 
 import com.naribackend.core.auth.EncodedUserPassword;
 import com.naribackend.core.auth.UserAccount;
+import com.naribackend.core.auth.UserNickname;
 import com.naribackend.core.email.UserEmail;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -31,7 +32,7 @@ public class UserAccountEntity {
 
     public static UserAccountEntity from(final UserAccount userAccount) {
         return UserAccountEntity.builder()
-                .nickname(userAccount.getNickname())
+                .nickname(userAccount.getNickname().getNickname())
                 .encodedUserPassword(userAccount.getEncodedUserPassword().getEncodedPassword())
                 .userEmail(userAccount.getEmail().getAddress())
                 .build();
@@ -40,7 +41,7 @@ public class UserAccountEntity {
     public UserAccount toUserAccount() {
         return UserAccount.builder()
                 .id(id)
-                .nickname(nickname)
+                .nickname(UserNickname.from(nickname))
                 .encodedUserPassword(EncodedUserPassword.from(encodedUserPassword))
                 .email(UserEmail.from(userEmail))
                 .build();
