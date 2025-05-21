@@ -5,6 +5,7 @@ import com.naribackend.core.auth.EmailVerificationRepository;
 import com.naribackend.core.email.UserEmail;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -22,14 +23,22 @@ public class EmailVerificationEntityRepository implements EmailVerificationRepos
     }
 
     @Override
-    public Optional<EmailVerification> findByUserEmail(UserEmail userEmail) {
+    public Optional<EmailVerification> findByUserEmail(final UserEmail userEmail) {
         String userEmailStr = userEmail.getAddress();
 
         return emailVerificationJpaRepository.findByUserEmail(userEmailStr).map(EmailVerificationEntity::toEmailVerification);
     }
 
     @Override
-    public boolean existsByUserEmail(UserEmail userEmail) {
+    public boolean existsByUserEmail(final UserEmail userEmail) {
         return emailVerificationJpaRepository.existsByUserEmail(userEmail.getAddress());
+    }
+
+    @Override
+    @Transactional
+    public void deleteByUserEmail(final UserEmail userEmail) {
+        String userEmailStr = userEmail.getAddress();
+
+        emailVerificationJpaRepository.deleteByUserEmail(userEmailStr);
     }
 }

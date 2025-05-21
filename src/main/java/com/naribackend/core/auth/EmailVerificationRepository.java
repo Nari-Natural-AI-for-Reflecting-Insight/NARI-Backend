@@ -11,4 +11,6 @@ public interface EmailVerificationRepository {
     Optional<EmailVerification> findByUserEmail(UserEmail userEmail);
 
     boolean existsByUserEmail(UserEmail userEmail);
+
+    void deleteByUserEmail(UserEmail userEmail);
 }
