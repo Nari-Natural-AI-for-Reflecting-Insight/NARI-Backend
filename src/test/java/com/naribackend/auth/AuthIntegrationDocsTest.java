@@ -207,6 +207,8 @@ class AuthIntegrationDocsTest {
 
         UserEmail newUserEmail = UserEmail.from(newEmail);
 
+        when(dateTimeProvider.getCurrentDateTime()).thenReturn(LocalDateTime.now());
+
         final VerificationCode verificationCode = VerificationCode.generateSixDigitCode();
         emailVerificationAppender.appendEmailVerification(newUserEmail, verificationCode);
 
