@@ -21,7 +21,7 @@ public enum ErrorType {
     AUTHENTICATION_FAIL(HttpStatus.BAD_REQUEST, ErrorCode.E400, "인증에 실패 하였습니다.", LogLevel.DEBUG),
     BIND_EXCEPTION(HttpStatus.BAD_REQUEST, ErrorCode.E400, "입력 형식이 올바르지 않습니다.", LogLevel.DEBUG),
     EXPIRED_VERIFICATION_CODE(HttpStatus.BAD_REQUEST, ErrorCode.E400, "인증 코드가 만료되었습니다.", LogLevel.DEBUG),
-    NOT_FOUND_USER(HttpStatus.NOT_FOUND, ErrorCode.E400, "사용자를 찾을 수 없습니다.", LogLevel.ERROR),
+    NOT_FOUND_USER(HttpStatus.NOT_FOUND, ErrorCode.E404, "사용자를 찾을 수 없습니다.", LogLevel.DEBUG),
     ;
 
     private final HttpStatus status;

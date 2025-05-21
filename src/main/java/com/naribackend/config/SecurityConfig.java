@@ -26,7 +26,7 @@ public class SecurityConfig {
                             "/api/v1/auth/sign-up",
                             "/api/v1/auth/sign-in/access-token",
                             "/api/v1/auth/me",
-                            "api/v1/user/me/withdrawal"
+                            "/api/v1/user/me/withdrawal"
                     ).permitAll()
                     .requestMatchers(
                             "/v3/api-docs/**",
