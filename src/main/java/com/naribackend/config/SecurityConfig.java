@@ -42,13 +42,14 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(
-                List.of(
-                        "https://nari-web.com", "https://api.nari-web.com", "https://www.nari-web.com",
-                        "http://localhost:3000", "http://localhost:5173", "https://api-dev.nari-web.com",
-                        "https://api-staging.nari-web.com"
-                )
-        );
+        config.setAllowedOriginPatterns(List.of(
+                "https://nari-web.com",
+                "https://*.nari-web.com",
+                "https://nari-web.pages.dev",
+                "https://*.nari-web.pages.dev",
+                "http://localhost:3000",
+                "http://localhost:5173"
+        ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
