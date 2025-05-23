@@ -26,4 +26,8 @@ public class UserAccount {
         this.encodedUserPassword = withdrawnDefaults.encodedPassword();
         this.email = withdrawnDefaults.email();
     }
+
+    public boolean isUserWithdrawn() {
+        return isUserWithdrawn;
+    }
 }

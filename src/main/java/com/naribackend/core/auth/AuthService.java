@@ -106,6 +106,10 @@ public class AuthService {
 
         rawUserPassword.matches(userPasswordEncoder, userAccount.getEncodedUserPassword());
 
+        if(userAccount.isUserWithdrawn()) {
+            throw new CoreException(ErrorType.WITHDRAWN_USER);
+        }
+
         return accessTokenHandler.createTokenBy(userAccount.getId());
     }
 
