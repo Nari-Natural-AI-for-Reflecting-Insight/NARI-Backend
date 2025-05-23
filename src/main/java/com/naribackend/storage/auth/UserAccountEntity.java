@@ -30,11 +30,16 @@ public class UserAccountEntity {
     @Column(name = "user_email", nullable = false)
     private String userEmail;
 
+    @Column(name = "is_user_withdrawn", nullable = false)
+    private boolean isUserWithdrawn;
+
     public static UserAccountEntity from(final UserAccount userAccount) {
         return UserAccountEntity.builder()
+                .id(userAccount.getId())
                 .nickname(userAccount.getNickname().getNickname())
                 .encodedUserPassword(userAccount.getEncodedUserPassword().getEncodedPassword())
                 .userEmail(userAccount.getEmail().getAddress())
+                .isUserWithdrawn(userAccount.isUserWithdrawn())
                 .build();
     }
 
@@ -44,6 +49,7 @@ public class UserAccountEntity {
                 .nickname(UserNickname.from(nickname))
                 .encodedUserPassword(EncodedUserPassword.from(encodedUserPassword))
                 .email(UserEmail.from(userEmail))
+                .isUserWithdrawn(isUserWithdrawn)
                 .build();
     }
 }

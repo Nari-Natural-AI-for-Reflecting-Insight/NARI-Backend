@@ -9,4 +9,6 @@ public interface EmailVerificationJpaRepository extends JpaRepository<EmailVerif
     Optional<EmailVerificationEntity> findByUserEmail(String userEmail);
 
     boolean existsByUserEmail(String userEmail);
+
+    void deleteByUserEmail(String userEmail);
 }

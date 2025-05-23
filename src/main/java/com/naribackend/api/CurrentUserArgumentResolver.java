@@ -1,8 +1,6 @@
 package com.naribackend.api;
 
-import com.naribackend.core.auth.AccessTokenHandler;
-import com.naribackend.core.auth.CurrentUser;
-import com.naribackend.core.auth.LoginUser;
+import com.naribackend.core.auth.*;
 import com.naribackend.support.error.CoreException;
 import com.naribackend.support.error.ErrorType;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,6 +28,8 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
     /** JWT 검증·파싱만 담당 */
     private final AccessTokenHandler accessTokenHandler;
 
+    private final UserAccountRepository userAccountRepository;
+
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
         return parameter.hasParameterAnnotation(CurrentUser.class)
@@ -51,6 +51,13 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
         }
 
         long id = accessTokenHandler.getUserIdFrom(accessToken);
+
+        UserAccount userAccount = userAccountRepository.findById(id)
+                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_EMAIL));
+
+        if (userAccount.isUserWithdrawn()) {
+            throw new CoreException(ErrorType.WITHDRAWN_USER);
+        }
 
         return LoginUser.builder()
                 .id(id)

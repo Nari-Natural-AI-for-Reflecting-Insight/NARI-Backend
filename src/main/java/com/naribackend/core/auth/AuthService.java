@@ -31,7 +31,9 @@ public class AuthService {
 
     private final DateTimeProvider dateTimeProvider;
 
-    private final static long EMAIL_VERIFICATION_TTL = 60 * 5;
+    private final static long EMAIL_VERIFICATION_TTL = 60 * 5; // 인증 코드의 TTL은 5분
+
+    private final static long VERIFIED_EMAIL_VERIFICATION_TTL = 60 * 60; // 인증된 이메일의 TTL은 1시간
 
     public void processVerificationCode(final UserEmail toUserEmail) {
         final VerificationCode verificationCode = VerificationCode.generateSixDigitCode();
@@ -80,9 +82,15 @@ public class AuthService {
             throw new CoreException(ErrorType.NOT_VERIFIED_EMAIL);
         }
 
+        if(emailVerificationReader.isVerificationExpired(newUserEmail, dateTimeProvider.getCurrentDateTime(), VERIFIED_EMAIL_VERIFICATION_TTL)) {
+            throw new CoreException(ErrorType.EXPIRED_VERIFICATION_CODE);
+        }
+
         if(userAccountRepository.existsByEmail(newUserEmail)) {
             throw new CoreException(ErrorType.ALREADY_SIGNED_EMAIL);
         }
+
+        emailVerificationRepository.deleteByUserEmail(newUserEmail);
 
         EncodedUserPassword encodedUserPassword = newRawUserPassword.encode(userPasswordEncoder);
         userAccountAppender.appendUserAccount(
@@ -97,6 +105,10 @@ public class AuthService {
                 .orElseThrow(() -> new CoreException(ErrorType.AUTHENTICATION_FAIL));
 
         rawUserPassword.matches(userPasswordEncoder, userAccount.getEncodedUserPassword());
+
+        if(userAccount.isUserWithdrawn()) {
+            throw new CoreException(ErrorType.WITHDRAWN_USER);
+        }
 
         return accessTokenHandler.createTokenBy(userAccount.getId());
     }
