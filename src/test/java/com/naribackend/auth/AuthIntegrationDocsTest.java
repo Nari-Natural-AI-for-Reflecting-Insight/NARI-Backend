@@ -9,6 +9,7 @@ import com.naribackend.core.DateTimeProvider;
 import com.naribackend.core.auth.*;
 import com.naribackend.core.email.EmailSender;
 import com.naribackend.core.email.UserEmail;
+import com.naribackend.core.user.UserService;
 import com.naribackend.infra.auth.AccessTokenHandlerImpl;
 import com.naribackend.support.ApiResponseDocs;
 import com.naribackend.support.error.CoreException;
@@ -71,6 +72,11 @@ class AuthIntegrationDocsTest {
 
     @MockitoBean
     EmailSender emailSender;
+
+    @Autowired
+    UserService userService;
+    @Autowired
+    private UserAccountRepository userAccountRepository;
 
     @Test
     @DisplayName("이메일 인증 코드 발송 API 성공 - 문서화")
@@ -396,6 +402,43 @@ class AuthIntegrationDocsTest {
                         ApiResponseDocs.ERROR_FIELDS()
                 ))
         );
+    }
+
+    @Test
+    @DisplayName("사용자 정보 조회 실패 - 탈퇴한 회원")
+    void getMe_fail_withdrawn_user() throws Exception {
+
+        // given
+        UserEmail userEmail = UserEmail.from("user1234@example.com");
+        String password = "password1234";
+        RawUserPassword userPassword = RawUserPassword.from(password);
+        EncodedUserPassword encodedPassword = userPassword.encode(userPasswordEncoder);
+
+        userAccountAppender.appendUserAccount(
+                userEmail,
+                encodedPassword,
+                UserNickname.from("nickname")
+        );
+
+        String accessToken = authService.createAccessToken(userEmail, userPassword);
+
+        // when & then
+        UserAccount userAccount = userAccountRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_EMAIL));
+
+        userService.withdrawUserAccount(userAccount.getId());
+
+        mockMvc.perform(
+                        RestDocumentationRequestBuilders.get("/api/v1/auth/me")
+                                .header("Authorization", "Bearer " + accessToken)
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().is4xxClientError())
+                .andDo(document("get-me",
+                        responseFields(
+                                ApiResponseDocs.ERROR_FIELDS()
+                        ))
+                );
     }
 
     @Test
