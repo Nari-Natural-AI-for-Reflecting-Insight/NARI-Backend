@@ -23,6 +23,7 @@ public enum ErrorType {
     EXPIRED_VERIFICATION_CODE(HttpStatus.BAD_REQUEST, ErrorCode.E400, "인증 코드가 만료되었습니다.", LogLevel.DEBUG),
     NOT_FOUND_USER(HttpStatus.NOT_FOUND, ErrorCode.E404, "사용자를 찾을 수 없습니다.", LogLevel.DEBUG),
     WITHDRAWN_USER(HttpStatus.BAD_REQUEST, ErrorCode.E400, "탈퇴한 사용자입니다.", LogLevel.ERROR),
+    CURRENT_PASSWORD_MATCH_FAIL(HttpStatus.BAD_REQUEST, ErrorCode.E400, "현재 비밀번호와 일치하지 않습니다.", LogLevel.DEBUG)
     ;
 
     private final HttpStatus status;

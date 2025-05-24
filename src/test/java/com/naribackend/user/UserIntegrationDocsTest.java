@@ -1,8 +1,12 @@
 package com.naribackend.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.naribackend.api.v1.user.request.ModifyUserPasswordRequest;
 import com.naribackend.core.auth.*;
 import com.naribackend.core.email.UserEmail;
 import com.naribackend.support.ApiResponseDocs;
+import com.naribackend.support.error.CoreException;
+import com.naribackend.support.error.ErrorType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +41,12 @@ public class UserIntegrationDocsTest {
 
     @Autowired
     private AuthService authService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
+    private UserAccountRepository userAccountRepository;
 
     @Test
     @DisplayName("회원 탈퇴 API 성공 - 문서화")
@@ -86,4 +96,92 @@ public class UserIntegrationDocsTest {
                 ))
             );
     }
+
+    @Test
+    @DisplayName("비밀번호 변경 API 성공 - 문서화")
+    void change_password_success_docs() throws Exception {
+
+        // given
+        UserEmail userEmail = UserEmail.from("user1234@example.com");
+        String originPassword = "password1234";
+        String newPassword = "newPassword1234";
+        RawUserPassword userPassword = RawUserPassword.from(originPassword);
+        EncodedUserPassword encodedPassword = userPassword.encode(userPasswordEncoder);
+
+        userAccountAppender.appendUserAccount(
+                userEmail,
+                encodedPassword,
+                UserNickname.from("nickname")
+        );
+
+        String accessToken = authService.createAccessToken(userEmail, userPassword);
+
+        // when & then
+        mockMvc.perform(
+                RestDocumentationRequestBuilders.patch("/api/v1/user/me/password")
+                        .header("Authorization", "Bearer " + accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(
+                                new ModifyUserPasswordRequest(
+                                        originPassword,
+                                        newPassword
+                                )
+                        ))
+            )
+            .andExpect(status().isOk())
+            .andDo(document("me-password-change",
+                    responseFields(
+                            ApiResponseDocs.SUCCESS_FIELDS()
+                    ))
+            );
+
+        // verify
+        UserAccount userAccount = userAccountRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_EMAIL));
+
+        RawUserPassword newRawUserPassword = RawUserPassword.from("newPassword1234");
+        newRawUserPassword.assertMatches(userPasswordEncoder, userAccount.getEncodedUserPassword());
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 API 실패 - 현재 비밀번호 불일치")
+    void change_password_fail_docs() throws Exception {
+
+        // given
+        UserEmail userEmail = UserEmail.from("user1234@example.com");
+        String originPassword = "password1234";
+        String newPassword = "newPassword1234";
+        RawUserPassword userPassword = RawUserPassword.from(originPassword);
+        EncodedUserPassword encodedPassword = userPassword.encode(userPasswordEncoder);
+
+        userAccountAppender.appendUserAccount(
+            userEmail,
+            encodedPassword,
+            UserNickname.from("nickname")
+        );
+
+        String accessToken = authService.createAccessToken(userEmail, userPassword);
+
+        String wrongPassword = "wrongPassword1234";
+
+        // when & then
+        mockMvc.perform(
+            RestDocumentationRequestBuilders.patch("/api/v1/user/me/password")
+                .header("Authorization", "Bearer " + accessToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(
+                    new ModifyUserPasswordRequest(
+                        wrongPassword,
+                        newPassword
+                    )
+                ))
+            )
+            .andExpect(status().is4xxClientError())
+            .andDo(document("me-password-change",
+                responseFields(
+                    ApiResponseDocs.ERROR_FIELDS()
+                ))
+            );
+    }
+
 }

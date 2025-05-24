@@ -26,11 +26,18 @@ public class RawUserPassword {
         return new RawUserPassword(raw);
     }
 
-    public void matches(
+    public boolean matches(
             final UserPasswordEncoder userPasswordEncoder,
             final EncodedUserPassword encodedUserPassword
     ) {
-        if (!userPasswordEncoder.matches(raw, encodedUserPassword.getEncodedPassword())) {
+        return userPasswordEncoder.matches(raw, encodedUserPassword.getEncodedPassword());
+    }
+
+    public void assertMatches(
+            final UserPasswordEncoder userPasswordEncoder,
+            final EncodedUserPassword encodedUserPassword
+    ) {
+        if (!matches(userPasswordEncoder, encodedUserPassword)) {
             throw new CoreException(ErrorType.AUTHENTICATION_FAIL);
         }
     }

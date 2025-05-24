@@ -1,14 +1,13 @@
 package com.naribackend.api.v1.user;
 
+import com.naribackend.api.v1.user.request.ModifyUserPasswordRequest;
 import com.naribackend.core.auth.CurrentUser;
 import com.naribackend.core.auth.LoginUser;
 import com.naribackend.core.user.UserService;
 import com.naribackend.support.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/user")
@@ -26,4 +25,13 @@ public class UserController {
         return ApiResponse.success();
     }
 
+    @PatchMapping("/me/password")
+    public ApiResponse<?> modifyPassword (
+        @Parameter(hidden = true) @CurrentUser final LoginUser loginUser,
+        @RequestBody final ModifyUserPasswordRequest request
+    ) {
+        userService.modifyPassword(loginUser, request.toOldRawUserPassword(), request.toNewRawUserPassword());
+
+        return ApiResponse.success();
+    }
 }

@@ -14,6 +14,7 @@ public record CreateUserAccountRequest (
         @Schema(description = "인증 코드를 받을 이메일 주소", example = "user@example.com")
         String newUserEmail,
 
+        @Length(min = 8, max = 100, message = "비밀번호는 8자 이상 100자 이하로 입력해주세요.")
         @NotBlank(message = "비밀번호는 필수입니다.")
         @Schema(description = "비밀번호", example = "password1234")
         String newPassword,

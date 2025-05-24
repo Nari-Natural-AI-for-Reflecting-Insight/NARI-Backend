@@ -104,7 +104,7 @@ public class AuthService {
         UserAccount userAccount = userAccountRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new CoreException(ErrorType.AUTHENTICATION_FAIL));
 
-        rawUserPassword.matches(userPasswordEncoder, userAccount.getEncodedUserPassword());
+        rawUserPassword.assertMatches(userPasswordEncoder, userAccount.getEncodedUserPassword());
 
         if(userAccount.isUserWithdrawn()) {
             throw new CoreException(ErrorType.WITHDRAWN_USER);

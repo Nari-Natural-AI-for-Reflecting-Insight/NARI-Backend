@@ -30,4 +30,8 @@ public class UserAccount {
     public boolean isUserWithdrawn() {
         return isUserWithdrawn;
     }
+
+    public void modifyPassword(final EncodedUserPassword newEncodedUserPassword) {
+        this.encodedUserPassword = newEncodedUserPassword;
+    }
 }
