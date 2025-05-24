@@ -34,4 +34,8 @@ public class UserAccount {
     public void modifyPassword(final EncodedUserPassword newEncodedUserPassword) {
         this.encodedUserPassword = newEncodedUserPassword;
     }
+
+    public void changeNickname(final UserNickname userNickname) {
+        this.nickname = userNickname;
+    }
 }

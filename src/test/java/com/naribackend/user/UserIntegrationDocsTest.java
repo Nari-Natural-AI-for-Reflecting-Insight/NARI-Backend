@@ -1,25 +1,33 @@
 package com.naribackend.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.naribackend.api.v1.user.request.ModifyUserNicknameRequest;
 import com.naribackend.api.v1.user.request.ModifyUserPasswordRequest;
 import com.naribackend.core.auth.*;
-import com.naribackend.core.email.UserEmail;
 import com.naribackend.support.ApiResponseDocs;
+import com.naribackend.support.TestUser;
+import com.naribackend.support.TestUserFactory;
+import com.naribackend.support.TestUserSupportConfig;
 import com.naribackend.support.error.CoreException;
 import com.naribackend.support.error.ErrorType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -28,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureRestDocs
 @AutoConfigureMockMvc
+@Import(TestUserSupportConfig.class)
 public class UserIntegrationDocsTest {
 
     @Autowired
@@ -37,34 +46,21 @@ public class UserIntegrationDocsTest {
     private UserPasswordEncoder userPasswordEncoder;
 
     @Autowired
-    private UserAccountAppender userAccountAppender;
-
-    @Autowired
-    private AuthService authService;
-
-    @Autowired
     private ObjectMapper objectMapper;
 
     @Autowired
     private UserAccountRepository userAccountRepository;
+
+    @Autowired
+    TestUserFactory testUserFactory;
 
     @Test
     @DisplayName("회원 탈퇴 API 성공 - 문서화")
     void withdraw_user_account_success_docs() throws Exception {
 
         // given
-        UserEmail userEmail = UserEmail.from("user1234@example.com");
-        String password = "password1234";
-        RawUserPassword userPassword = RawUserPassword.from(password);
-        EncodedUserPassword encodedPassword = userPassword.encode(userPasswordEncoder);
-
-        userAccountAppender.appendUserAccount(
-            userEmail,
-            encodedPassword,
-            UserNickname.from("nickname")
-        );
-
-        String accessToken = authService.createAccessToken(userEmail, userPassword);
+        TestUser testUser = testUserFactory.createTestUser();
+        String accessToken = testUser.accessToken();
 
         // when & then
         mockMvc.perform(
@@ -102,28 +98,18 @@ public class UserIntegrationDocsTest {
     void change_password_success_docs() throws Exception {
 
         // given
-        UserEmail userEmail = UserEmail.from("user1234@example.com");
-        String originPassword = "password1234";
+        TestUser testUser = testUserFactory.createTestUser();
+        String accessToken = testUser.accessToken();
         String newPassword = "newPassword1234";
-        RawUserPassword userPassword = RawUserPassword.from(originPassword);
-        EncodedUserPassword encodedPassword = userPassword.encode(userPasswordEncoder);
-
-        userAccountAppender.appendUserAccount(
-                userEmail,
-                encodedPassword,
-                UserNickname.from("nickname")
-        );
-
-        String accessToken = authService.createAccessToken(userEmail, userPassword);
 
         // when & then
         mockMvc.perform(
-                RestDocumentationRequestBuilders.patch("/api/v1/user/me/password")
+                patch("/api/v1/user/me/password")
                         .header("Authorization", "Bearer " + accessToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
                                 new ModifyUserPasswordRequest(
-                                        originPassword,
+                                        testUser.rawPassword(),
                                         newPassword
                                 )
                         ))
@@ -136,7 +122,7 @@ public class UserIntegrationDocsTest {
             );
 
         // verify
-        UserAccount userAccount = userAccountRepository.findByEmail(userEmail)
+        UserAccount userAccount = userAccountRepository.findByEmail(testUser.email())
                 .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_EMAIL));
 
         RawUserPassword newRawUserPassword = RawUserPassword.from("newPassword1234");
@@ -148,25 +134,15 @@ public class UserIntegrationDocsTest {
     void change_password_fail_docs() throws Exception {
 
         // given
-        UserEmail userEmail = UserEmail.from("user1234@example.com");
-        String originPassword = "password1234";
+        TestUser testUser = testUserFactory.createTestUser();
+        String accessToken = testUser.accessToken();
+
         String newPassword = "newPassword1234";
-        RawUserPassword userPassword = RawUserPassword.from(originPassword);
-        EncodedUserPassword encodedPassword = userPassword.encode(userPasswordEncoder);
-
-        userAccountAppender.appendUserAccount(
-            userEmail,
-            encodedPassword,
-            UserNickname.from("nickname")
-        );
-
-        String accessToken = authService.createAccessToken(userEmail, userPassword);
-
         String wrongPassword = "wrongPassword1234";
 
         // when & then
         mockMvc.perform(
-            RestDocumentationRequestBuilders.patch("/api/v1/user/me/password")
+            patch("/api/v1/user/me/password")
                 .header("Authorization", "Bearer " + accessToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(
@@ -184,4 +160,97 @@ public class UserIntegrationDocsTest {
             );
     }
 
+    @Test
+    @DisplayName("닉네임 변경 API 성공 - 문서화")
+    void modify_user_nickname_success_docs() throws Exception {
+
+        // given
+        TestUser testUser = testUserFactory.createTestUser();
+        String accessToken = testUser.accessToken();
+        UserNickname newNickname = UserNickname.from("newNickname");
+
+        ModifyUserNicknameRequest request = new ModifyUserNicknameRequest(newNickname.getNickname());
+
+        // when & then
+        mockMvc.perform(
+                patch("/api/v1/user/me/nickname")
+                    .header("Authorization", "Bearer " + accessToken)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request))
+            )
+            .andExpect(status().isOk())
+            .andDo(document("me-nickname-change",
+                    responseFields(
+                        ApiResponseDocs.SUCCESS_FIELDS()
+                    ))
+            );
+
+        // verify
+        UserAccount userAccount = userAccountRepository.findByEmail(testUser.email())
+                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_EMAIL));
+
+        assertThat(userAccount.getNickname())
+                .isEqualTo(newNickname);
+    }
+
+    // 다양한 값 검증
+    @ParameterizedTest
+    @ValueSource(strings = {"a", "anotherNick", "테스트닉", ""})
+    @DisplayName("닉네임 변경 API 성공 - 다양한 닉네임")
+    void modify_user_nickname_various_success(String newNickNameStr) throws Exception {
+
+        // given
+        TestUser testUser = testUserFactory.createTestUser();
+        String accessToken = testUser.accessToken();
+        UserNickname newNickname = UserNickname.from(newNickNameStr);
+
+        ModifyUserNicknameRequest request = new ModifyUserNicknameRequest(newNickname.getNickname());
+
+        // when & then
+        mockMvc.perform(
+                patch("/api/v1/user/me/nickname")
+                    .header("Authorization", "Bearer " + accessToken)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request))
+            )
+            .andExpect(status().isOk());
+
+        // verify
+        UserAccount userAccount = userAccountRepository.findByEmail(testUser.email())
+                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_EMAIL));
+
+        assertThat(userAccount.getNickname())
+                .isEqualTo(newNickname);
+
+        // 새로운 닉네임이 비어 있는 경우 랜덤 닉네임이 생성되므로, 비어 있지 않은지 확인
+        if(newNickNameStr.isEmpty()) {
+            assertThat(userAccount.getNickname().getNickname()).isNotEmpty();
+        }
+    }
+
+    @Test
+    @DisplayName("닉네임 변경 API 실패 - 너무 긴 닉네임")
+    void modify_user_nickname_fail_unauthenticated_docs() throws Exception {
+
+        // given
+        TestUser testUser = testUserFactory.createTestUser();
+        String accessToken = testUser.accessToken();
+        UserNickname newNickname = UserNickname.from("newNicknamenewNicknamenewNicknamenewNicknamenewNicknamenewNickname");
+
+        ModifyUserNicknameRequest request = new ModifyUserNicknameRequest(newNickname.getNickname());
+
+        // when & then
+        mockMvc.perform(
+                patch("/api/v1/user/me/nickname")
+                    .header("Authorization", "Bearer " + accessToken)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request))
+            )
+            .andExpect(status().is4xxClientError())
+            .andDo(document("me-nickname-change-unauthenticated",
+                responseFields(
+                    ApiResponseDocs.ERROR_FIELDS()
+                ))
+            );
+    }
 }

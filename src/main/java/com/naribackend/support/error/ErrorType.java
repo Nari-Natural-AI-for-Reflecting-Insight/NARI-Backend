@@ -18,12 +18,11 @@ public enum ErrorType {
     INVALID_PASSWORD(HttpStatus.BAD_REQUEST, ErrorCode.E400, "잘 못된 비밀번호 형식입니다.", LogLevel.DEBUG),
     NOT_VERIFIED_EMAIL(HttpStatus.BAD_REQUEST, ErrorCode.E400, "인증이 되지 않은 이메일 입니다.", LogLevel.DEBUG),
     ALREADY_SIGNED_EMAIL(HttpStatus.BAD_REQUEST, ErrorCode.E400, "이미 가입된 이메일입니다.", LogLevel.DEBUG),
-    AUTHENTICATION_FAIL(HttpStatus.BAD_REQUEST, ErrorCode.E400, "인증에 실패 하였습니다.", LogLevel.DEBUG),
+    AUTHENTICATION_FAIL(HttpStatus.UNAUTHORIZED, ErrorCode.E401, "로그인에 실패 하였습니다.", LogLevel.DEBUG),
     BIND_EXCEPTION(HttpStatus.BAD_REQUEST, ErrorCode.E400, "입력 형식이 올바르지 않습니다.", LogLevel.DEBUG),
     EXPIRED_VERIFICATION_CODE(HttpStatus.BAD_REQUEST, ErrorCode.E400, "인증 코드가 만료되었습니다.", LogLevel.DEBUG),
     NOT_FOUND_USER(HttpStatus.NOT_FOUND, ErrorCode.E404, "사용자를 찾을 수 없습니다.", LogLevel.DEBUG),
     WITHDRAWN_USER(HttpStatus.BAD_REQUEST, ErrorCode.E400, "탈퇴한 사용자입니다.", LogLevel.ERROR),
-    CURRENT_PASSWORD_MATCH_FAIL(HttpStatus.BAD_REQUEST, ErrorCode.E400, "현재 비밀번호와 일치하지 않습니다.", LogLevel.DEBUG)
     ;
 
     private final HttpStatus status;
