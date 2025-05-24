@@ -26,7 +26,7 @@ public class RawUserPassword {
         return new RawUserPassword(raw);
     }
 
-    public void matches(
+    public void assertMatches(
             final UserPasswordEncoder userPasswordEncoder,
             final EncodedUserPassword encodedUserPassword
     ) {
