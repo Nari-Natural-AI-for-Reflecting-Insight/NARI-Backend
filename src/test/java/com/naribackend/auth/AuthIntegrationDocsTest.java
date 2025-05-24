@@ -189,7 +189,7 @@ class AuthIntegrationDocsTest {
                         new GetAccessTokenRequest(userEmail.getAddress(), "this_is_invalid_password"))
                     )
         )
-        .andExpect(status().isBadRequest())
+        .andExpect(status().isUnauthorized())
         .andDo(document("access-token",
                 requestFields(
                     fieldWithPath("email").description("이메일"),

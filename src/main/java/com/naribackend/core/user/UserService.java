@@ -32,7 +32,7 @@ public class UserService {
                 .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_USER));
 
         if (!oldPassword.matches(userPasswordEncoder, userAccount.getEncodedUserPassword())) {
-            throw new CoreException(ErrorType.CURRENT_PASSWORD_MATCH_FAIL);
+            throw new CoreException(ErrorType.AUTHENTICATION_FAIL);
         }
 
         EncodedUserPassword newEncodedUserPassword = newPassword.encode(userPasswordEncoder);
