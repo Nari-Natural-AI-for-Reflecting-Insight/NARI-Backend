@@ -31,7 +31,9 @@ public class UserService {
         UserAccount userAccount = userAccountRepository.findById(loginUser.getId())
                 .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_USER));
 
-        oldPassword.assertMatches(userPasswordEncoder, userAccount.getEncodedUserPassword());
+        if (!oldPassword.matches(userPasswordEncoder, userAccount.getEncodedUserPassword())) {
+            throw new CoreException(ErrorType.CURRENT_PASSWORD_MATCH_FAIL);
+        }
 
         EncodedUserPassword newEncodedUserPassword = newPassword.encode(userPasswordEncoder);
 
