@@ -208,7 +208,7 @@ public class UserIntegrationDocsTest {
 
         // when & then
         mockMvc.perform(
-                RestDocumentationRequestBuilders.patch("/api/v1/user/me/nickname")
+                patch("/api/v1/user/me/nickname")
                     .header("Authorization", "Bearer " + accessToken)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
