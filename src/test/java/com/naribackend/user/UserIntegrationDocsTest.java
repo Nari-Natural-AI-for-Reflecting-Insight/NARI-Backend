@@ -98,7 +98,7 @@ public class UserIntegrationDocsTest {
     }
 
     @Test
-    @DisplayName("비밀번 변경 API 성공 - 문서화")
+    @DisplayName("비밀번호 변경 API 성공 - 문서화")
     void change_password_success_docs() throws Exception {
 
         // given
