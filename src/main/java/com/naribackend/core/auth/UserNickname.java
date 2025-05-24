@@ -47,4 +47,18 @@ public class UserNickname {
     public static UserNickname from (final String nickname) {
         return new UserNickname(nickname);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof UserNickname that)) return false;
+        if ( hashCode() != that.hashCode()) return false;
+
+        return nickname.equals(that.nickname);
+    }
+
+    @Override
+    public int hashCode() {
+        return nickname.hashCode();
+    }
 }
