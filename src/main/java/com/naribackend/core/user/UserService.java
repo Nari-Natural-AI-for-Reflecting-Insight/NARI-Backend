@@ -41,4 +41,13 @@ public class UserService {
 
         userAccountRepository.saveUserAccount(userAccount);
     }
+
+    public void modifyNickname(final LoginUser loginUser, final UserNickname userNickname) {
+        UserAccount userAccount = userAccountRepository.findById(loginUser.getId())
+                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_USER));
+
+        userAccount.changeNickname(userNickname);
+
+        userAccountRepository.saveUserAccount(userAccount);
+    }
 }

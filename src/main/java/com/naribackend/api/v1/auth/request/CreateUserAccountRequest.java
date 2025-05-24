@@ -19,7 +19,6 @@ public record CreateUserAccountRequest (
         @Schema(description = "비밀번호", example = "password1234")
         String newPassword,
 
-        @Length(max = 20, message = "닉네임은 20자 이하로 입력해주세요.")
         @Schema(description = "닉네임", example = "nickname")
         String newNickname
 ){
