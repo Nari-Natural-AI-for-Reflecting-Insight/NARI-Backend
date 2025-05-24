@@ -33,8 +33,8 @@ public class UserController {
     }
 
     @Operation(
-        summary = "내 정보 조회",
-        description = "로그인한 사용자의 정보를 조회합니다."
+        summary = "비밀번호 수정",
+        description = "로그인한 사용자의 비밀번호를 수정합니다."
     )
     @PatchMapping("/me/password")
     public ApiResponse<?> modifyPassword (
