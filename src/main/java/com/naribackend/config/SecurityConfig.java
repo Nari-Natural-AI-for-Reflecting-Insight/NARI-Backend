@@ -29,7 +29,7 @@ public class SecurityConfig {
                             "/api/v1/user/me/withdrawal",
                             "/api/v1/user/me/password",
                             "/api/v1/user/me/nickname",
-                            "/api/v1/session/realtime"
+                            "/api/v1/token/realtime"
                     ).permitAll()
                     .requestMatchers(
                             "/v3/api-docs/**",

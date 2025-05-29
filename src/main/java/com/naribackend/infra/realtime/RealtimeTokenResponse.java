@@ -2,12 +2,12 @@ package com.naribackend.infra.realtime;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import com.naribackend.core.session.RealtimeSession;
+import com.naribackend.core.token.RealtimeTokenInfo;
 
 import java.util.List;
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public record RealtimeSessionResponse(
+public record RealtimeTokenResponse(
         String id,
         String object,
         long expiresAt,
@@ -29,10 +29,10 @@ public record RealtimeSessionResponse(
         List<String> tools
 ) {
 
-    public RealtimeSession toRealtimeSession() {
-        return RealtimeSession.builder()
-                .id(id)
-                .clientSecret(clientSecret != null ? clientSecret.value() : null)
+    public RealtimeTokenInfo toRealtimeTokenInfo() {
+        return RealtimeTokenInfo.builder()
+                .sessionId(id)
+                .ephemeralToken(clientSecret != null ? clientSecret.value() : null)
                 .voice(voice)
                 .build();
     }

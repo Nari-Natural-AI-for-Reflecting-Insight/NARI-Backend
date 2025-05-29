@@ -1,6 +1,6 @@
-package com.naribackend.storage.session;
+package com.naribackend.storage.token;
 
-import com.naribackend.core.session.RealtimeSessionHistory;
+import com.naribackend.core.token.RealtimeTokenHistory;
 import com.naribackend.storage.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -11,9 +11,9 @@ import lombok.NoArgsConstructor;
 @Entity
 @Builder
 @AllArgsConstructor
-@Table(name = "realtime_session_history")
+@Table(name = "realtime_token_history")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class RealtimeSessionHistoryEntity extends BaseEntity {
+public class RealtimeTokenHistoryEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,14 +28,14 @@ public class RealtimeSessionHistoryEntity extends BaseEntity {
     @Column(name = "voice", nullable = false)
     private String voice;
 
-    public static RealtimeSessionHistoryEntity from(
-            final RealtimeSessionHistory realtimeSessionHistory
+    public static RealtimeTokenHistoryEntity from(
+            final RealtimeTokenHistory realtimeTokenHistory
     ) {
-        return RealtimeSessionHistoryEntity.builder()
-                .id(realtimeSessionHistory.getId())
-                .userId(realtimeSessionHistory.getUserId())
-                .realtimeSessionId(realtimeSessionHistory.getRealtimeSessionId())
-                .voice(realtimeSessionHistory.getVoice())
+        return RealtimeTokenHistoryEntity.builder()
+                .id(realtimeTokenHistory.getId())
+                .userId(realtimeTokenHistory.getUserId())
+                .realtimeSessionId(realtimeTokenHistory.getRealtimeSessionId())
+                .voice(realtimeTokenHistory.getVoice())
                 .build();
     }
 

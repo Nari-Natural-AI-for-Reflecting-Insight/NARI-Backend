@@ -1,10 +1,9 @@
-package com.naribackend.api.v1.session;
+package com.naribackend.api.v1.token;
 
-import com.naribackend.api.v1.session.response.GetRealtimeSessionResponse;
+import com.naribackend.api.v1.token.response.GetRealtimeTokenResponse;
 import com.naribackend.core.auth.CurrentUser;
 import com.naribackend.core.auth.LoginUser;
-import com.naribackend.core.session.RealtimeSession;
-import com.naribackend.core.session.SessionService;
+import com.naribackend.core.token.TokenService;
 import com.naribackend.support.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
@@ -13,19 +12,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/session")
+@RequestMapping("/api/v1/token")
 @RequiredArgsConstructor
-public class SessionController {
+public class TokenController {
 
-    private final SessionService sessionService;
+    private final TokenService tokenService;
 
     @PostMapping("/realtime")
-    public ApiResponse<GetRealtimeSessionResponse> createSession(
+    public ApiResponse<GetRealtimeTokenResponse> createToken(
         @Parameter(hidden = true)
         @CurrentUser final LoginUser loginUser
     ) {
-        RealtimeSession realtimeSession = sessionService.createRealtimeSession(loginUser);
-        var response = GetRealtimeSessionResponse.from(realtimeSession);
+        var tokenInfo = tokenService.createTokenInfo(loginUser);
+        var response = GetRealtimeTokenResponse.from(tokenInfo);
 
         return ApiResponse.success(response);
     }
