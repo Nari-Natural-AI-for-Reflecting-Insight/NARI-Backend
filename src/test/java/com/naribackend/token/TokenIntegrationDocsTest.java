@@ -103,7 +103,7 @@ public class TokenIntegrationDocsTest {
                 .contentType(MediaType.APPLICATION_JSON)
             )
             .andExpect(status().isUnauthorized())
-            .andDo(document("create-realtime-token-success",
+            .andDo(document("create-realtime-token-invalid-access-token",
                 responseFields(
                     ApiResponseDocs.ERROR_FIELDS()
                 ))
@@ -124,7 +124,7 @@ public class TokenIntegrationDocsTest {
                 .contentType(MediaType.APPLICATION_JSON)
             )
             .andExpect(status().isUnauthorized())
-            .andDo(document("create-realtime-token-success",
+            .andDo(document("create-realtime-token-not-token",
                 responseFields(
                     ApiResponseDocs.ERROR_FIELDS()
                 ))
