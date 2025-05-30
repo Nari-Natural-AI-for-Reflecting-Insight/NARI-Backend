@@ -23,6 +23,8 @@ public enum ErrorType {
     EXPIRED_VERIFICATION_CODE(HttpStatus.BAD_REQUEST, ErrorCode.E400, "인증 코드가 만료되었습니다.", LogLevel.DEBUG),
     NOT_FOUND_USER(HttpStatus.NOT_FOUND, ErrorCode.E404, "사용자를 찾을 수 없습니다.", LogLevel.DEBUG),
     WITHDRAWN_USER(HttpStatus.BAD_REQUEST, ErrorCode.E400, "탈퇴한 사용자입니다.", LogLevel.ERROR),
+    REALTIME_TOKEN_CREATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.E500, "임시 토큰 생성에 실패했습니다.", LogLevel.ERROR),
+    AUTHENTICATION_REQUIRED(HttpStatus.UNAUTHORIZED, ErrorCode.E401, "로그인이 필요합니다.", LogLevel.DEBUG),
     ;
 
     private final HttpStatus status;

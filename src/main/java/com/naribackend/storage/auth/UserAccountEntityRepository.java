@@ -4,11 +4,11 @@ import com.naribackend.core.auth.UserAccount;
 import com.naribackend.core.auth.UserAccountRepository;
 import com.naribackend.core.email.UserEmail;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Component
+@Repository
 @RequiredArgsConstructor
 public class UserAccountEntityRepository implements UserAccountRepository {
 

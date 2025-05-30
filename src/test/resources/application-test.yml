@@ -16,3 +16,8 @@ spring:
     console:
       enabled: true
       path: /h2-console
+
+openai:
+  realtime:
+    key: "test-key"
+    token-uri: "https://api.openai.com/v1/realtime/sessions"

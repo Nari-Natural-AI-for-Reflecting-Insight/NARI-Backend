@@ -47,7 +47,7 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
         String accessToken = resolveToken(Objects.requireNonNull(request));
 
         if (accessToken == null || !accessTokenHandler.validate(accessToken)) {
-            throw new CoreException(ErrorType.AUTHENTICATION_FAIL);
+            throw new CoreException(ErrorType.AUTHENTICATION_REQUIRED);
         }
 
         long id = accessTokenHandler.getUserIdFrom(accessToken);
