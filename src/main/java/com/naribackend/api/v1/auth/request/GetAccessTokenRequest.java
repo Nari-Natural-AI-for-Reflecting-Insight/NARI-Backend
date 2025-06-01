@@ -3,7 +3,9 @@ package com.naribackend.api.v1.auth.request;
 import com.naribackend.core.auth.RawUserPassword;
 import com.naribackend.core.email.UserEmail;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 public record GetAccessTokenRequest(
 

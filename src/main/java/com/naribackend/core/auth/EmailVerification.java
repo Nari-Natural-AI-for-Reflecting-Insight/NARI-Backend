@@ -1,7 +1,10 @@
 package com.naribackend.core.auth;
 
 import com.naribackend.core.email.UserEmail;
-import lombok.*;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 
 import java.time.Duration;
 import java.time.LocalDateTime;

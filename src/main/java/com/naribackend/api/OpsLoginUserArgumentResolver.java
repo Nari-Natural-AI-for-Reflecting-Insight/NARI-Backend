@@ -1,12 +1,12 @@
 package com.naribackend.api;
 
-import com.naribackend.core.auth.*;
+import com.naribackend.core.auth.AccessTokenHandler;
+import com.naribackend.core.auth.CurrentUser;
+import com.naribackend.core.operation.OpsLoginUser;
+import com.naribackend.core.operation.OpsUserAccountRepository;
 import com.naribackend.support.error.CoreException;
 import com.naribackend.support.error.ErrorType;
 import jakarta.servlet.http.HttpServletRequest;
-
-import java.util.Objects;
-
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
@@ -16,24 +16,20 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
-/**
- * {@code @CurrentUser LoginUser user} 매개변수에
- * Authorization 헤더의 Bearer 토큰을 파싱해 만든 LoginUser 를 그대로 주입한다.
- *
- */
+import java.util.Objects;
+
 @Component
 @RequiredArgsConstructor
-public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolver {
+public class OpsLoginUserArgumentResolver implements HandlerMethodArgumentResolver {
 
-    /** JWT 검증·파싱만 담당 */
     private final AccessTokenHandler accessTokenHandler;
 
-    private final UserAccountRepository userAccountRepository;
+    private final OpsUserAccountRepository opsUserAccountRepository;
 
     @Override
-    public boolean supportsParameter(MethodParameter parameter) {
+    public boolean supportsParameter(@NonNull MethodParameter parameter) {
         return parameter.hasParameterAnnotation(CurrentUser.class)
-                && parameter.getParameterType().equals(LoginUser.class);
+                && parameter.getParameterType().equals(OpsLoginUser.class);
     }
 
     @Override
@@ -41,7 +37,8 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
             @NonNull MethodParameter parameter,
             ModelAndViewContainer mavContainer,
             NativeWebRequest webRequest,
-            WebDataBinderFactory binderFactory) {
+            WebDataBinderFactory binderFactory
+    ) {
 
         HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
         String accessToken = resolveToken(Objects.requireNonNull(request));
@@ -52,14 +49,13 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
 
         long id = accessTokenHandler.getUserIdFrom(accessToken);
 
-        UserAccount userAccount = userAccountRepository.findById(id)
-                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_EMAIL));
+        boolean isOpsUser = opsUserAccountRepository.isOpsUserByUserId(id);
 
-        if (userAccount.isUserWithdrawn()) {
-            throw new CoreException(ErrorType.WITHDRAWN_USER);
+        if( !isOpsUser ) {
+            throw new CoreException(ErrorType.NOT_FOUND_OPS_USER);
         }
 
-        return LoginUser.builder()
+        return OpsLoginUser.builder()
                 .id(id)
                 .build();
     }
