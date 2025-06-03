@@ -1,5 +1,6 @@
 package com.naribackend.core.operation;
 
+import com.naribackend.storage.operation.OpsUserCreditAppender;
 import com.naribackend.support.error.CoreException;
 import com.naribackend.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
@@ -10,11 +11,11 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class OpsCreditService {
 
-    private final OpsUserCreditRepository opsUserCreditRepository;
-
     private final OpsUserAccountRepository opsUserAccountRepository;
 
     private final OpsUserCreditHistoryRepository opsUserCreditHistoryRepository;
+
+    private final OpsUserCreditAppender opsUserCreditAppender;
 
     @Transactional
     public void chargeCredit(
@@ -26,22 +27,22 @@ public class OpsCreditService {
         OpsUserAccount targetUserAccount = opsUserAccountRepository.findByEmail(targetEmail)
                 .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_USER));
 
-        OpsUserCredit targetUserCredit = opsUserCreditRepository.findByUserId(targetUserAccount.getId())
-                        .orElseGet(() -> OpsUserCredit.builder()
-                                .credit(0)
-                                .userId(targetUserAccount.getId())
-                                .build()
-                        );
+        if (targetUserAccount.isUserWithdrawn()) {
+            throw new CoreException(ErrorType.USER_WITHDRAWN);
+        }
 
-        targetUserCredit.charge(creditAmount);
-        OpsUserCreditHistory userCreditHistory = OpsUserCreditHistory.builder()
-                .operationId(opsLoginUser.getId())
-                .modifiedUserId(targetUserAccount.getId())
-                .reason(reason)
-                .amountChanged(creditAmount)
-                .build();
+        opsUserCreditAppender.appendCredit(
+                targetUserAccount.getId(),
+                creditAmount
+        );
 
-        opsUserCreditRepository.save(targetUserCredit);
+        OpsUserCreditHistory userCreditHistory = OpsUserCreditHistory.of(
+                opsLoginUser,
+                targetUserAccount,
+                reason,
+                creditAmount
+        );
+
         opsUserCreditHistoryRepository.save(userCreditHistory);
     }
 }

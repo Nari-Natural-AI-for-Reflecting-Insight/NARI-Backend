@@ -6,5 +6,7 @@ public interface OpsUserCreditRepository {
 
     Optional<OpsUserCredit> findByUserId(long userId);
 
-    void save(OpsUserCredit opsUserCredit);
+    OpsUserCredit save(OpsUserCredit opsUserCredit);
+
+    int addCredit(long userId, long creditAmount);
 }

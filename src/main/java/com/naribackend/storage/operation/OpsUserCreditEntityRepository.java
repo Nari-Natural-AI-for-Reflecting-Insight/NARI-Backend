@@ -20,9 +20,14 @@ public class OpsUserCreditEntityRepository implements OpsUserCreditRepository {
     }
 
     @Override
-    public void save(OpsUserCredit opsUserCredit) {
+    public OpsUserCredit save(OpsUserCredit opsUserCredit) {
         OpsUserCreditEntity opsUserCreditEntity = OpsUserCreditEntity.from(opsUserCredit);
 
-        opsUserCreditJpaRepository.save(opsUserCreditEntity);
+        return opsUserCreditJpaRepository.save(opsUserCreditEntity).toOpsUserCredit();
+    }
+
+    @Override
+    public int addCredit(long userId, long creditAmount) {
+        return opsUserCreditJpaRepository.addCredit(userId, creditAmount);
     }
 }

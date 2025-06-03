@@ -42,4 +42,14 @@ public class OpsUserCreditHistoryEntity extends BaseEntity {
                 .amountChanged(opsUserCreditHistory.getAmountChanged())
                 .build();
     }
+
+    public OpsUserCreditHistory toDomain() {
+        return OpsUserCreditHistory.builder()
+                .id(this.id)
+                .operationId(this.operationId)
+                .modifiedUserId(this.modifiedUserId)
+                .reason(this.reason)
+                .amountChanged(this.amountChanged)
+                .build();
+    }
 }
