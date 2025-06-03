@@ -4,9 +4,11 @@ import com.naribackend.storage.operation.OpsUserCreditAppender;
 import com.naribackend.support.error.CoreException;
 import com.naribackend.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OpsCreditService {
@@ -28,6 +30,7 @@ public class OpsCreditService {
                 .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_USER));
 
         if (targetUserAccount.isUserWithdrawn()) {
+            log.warn("chargeCredit: withdrawn user={} operator={}", targetUserAccount.getId(), opsLoginUser.getId());
             throw new CoreException(ErrorType.USER_WITHDRAWN);
         }
 
@@ -44,5 +47,8 @@ public class OpsCreditService {
         );
 
         opsUserCreditHistoryRepository.save(userCreditHistory);
+
+        log.info("chargeCredit: user={} amount={} reason={} operator={}",
+                targetUserAccount.getId(), creditAmount, reason, targetUserAccount.getId());
     }
 }
