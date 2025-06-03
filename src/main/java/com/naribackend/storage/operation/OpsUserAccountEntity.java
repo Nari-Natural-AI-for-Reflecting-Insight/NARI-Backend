@@ -19,6 +19,9 @@ public class OpsUserAccountEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "nickname", nullable = false)
+    private String nickname;
+
     @Column(name = "user_email", nullable = false)
     private String userEmail;
 
@@ -29,12 +32,28 @@ public class OpsUserAccountEntity {
     @Column(name = "user_account_role")
     private UserAccountRole userAccountRole;
 
+    @Column(name = "encoded_user_password", nullable = false)
+    private String encodedUserPassword;
+
+    public static OpsUserAccountEntity from(final OpsUserAccount opsUserAccount) {
+        return OpsUserAccountEntity.builder()
+                .id(opsUserAccount.getId())
+                .isUserWithdrawn(opsUserAccount.isUserWithdrawn())
+                .userEmail(opsUserAccount.getUserEmail())
+                .userAccountRole(opsUserAccount.getUserAccountRole())
+                .encodedUserPassword(opsUserAccount.getEncodedUserPassword())
+                .nickname(opsUserAccount.getNickname())
+                .build();
+    }
+
     public OpsUserAccount toOpsUserAccount() {
         return OpsUserAccount.builder()
                 .id(id)
                 .isUserWithdrawn(isUserWithdrawn)
                 .userEmail(userEmail)
                 .userAccountRole(userAccountRole)
+                .encodedUserPassword(encodedUserPassword)
+                .nickname(nickname)
                 .build();
     }
 

@@ -25,4 +25,12 @@ public class OpsUserAccountEntityRepository implements OpsUserAccountRepository 
         return opsUserAccountJpaRepository.findByUserEmail(email)
                 .map(OpsUserAccountEntity::toOpsUserAccount);
     }
+
+    @Override
+    public OpsUserAccount save(OpsUserAccount opsUserAccount) {
+        OpsUserAccountEntity entity = OpsUserAccountEntity.from(opsUserAccount);
+        OpsUserAccountEntity savedEntity = opsUserAccountJpaRepository.save(entity);
+
+        return savedEntity.toOpsUserAccount();
+    }
 }

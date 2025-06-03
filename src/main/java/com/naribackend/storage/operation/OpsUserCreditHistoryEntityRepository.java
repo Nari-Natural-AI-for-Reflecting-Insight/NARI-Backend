@@ -5,6 +5,8 @@ import com.naribackend.core.operation.OpsUserCreditHistoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 @RequiredArgsConstructor
 public class OpsUserCreditHistoryEntityRepository implements OpsUserCreditHistoryRepository {
@@ -16,5 +18,13 @@ public class OpsUserCreditHistoryEntityRepository implements OpsUserCreditHistor
         OpsUserCreditHistoryEntity opsUserCreditHistoryEntity = OpsUserCreditHistoryEntity.from(opsUserCreditHistory);
 
         opsUserCreditHistoryJpaRepository.save(opsUserCreditHistoryEntity);
+    }
+
+    @Override
+    public List<OpsUserCreditHistory> findAllByUserId(long userId) {
+        return opsUserCreditHistoryJpaRepository.findAllByModifiedUserId(userId)
+                .stream()
+                .map(OpsUserCreditHistoryEntity::toDomain)
+                .toList();
     }
 }

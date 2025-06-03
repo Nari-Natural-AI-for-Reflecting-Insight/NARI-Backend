@@ -15,9 +15,13 @@ public class OpsUserAccount {
 
     private final Long id;
 
+    private final String nickname;
+
     private final boolean isUserWithdrawn;
 
     private final String userEmail;
 
     private final UserAccountRole userAccountRole;
+
+    private final String encodedUserPassword;
 }

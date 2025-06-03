@@ -14,4 +14,18 @@ public class OpsUserCreditHistory {
     private OpsCreditReason reason;
     private long amountChanged;
     private LocalDateTime createdAt;
+
+    public static OpsUserCreditHistory of(
+            OpsLoginUser opsLoginUser,
+            OpsUserAccount targetUserAccount,
+            OpsCreditReason reason,
+            long amountChanged
+    ) {
+        return OpsUserCreditHistory.builder()
+                .operationId(opsLoginUser.getId())
+                .modifiedUserId(targetUserAccount.getId())
+                .reason(reason)
+                .amountChanged(amountChanged)
+                .build();
+    }
 }
