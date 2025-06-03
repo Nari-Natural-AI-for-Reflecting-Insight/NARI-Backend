@@ -1,6 +1,13 @@
 package com.naribackend.support;
 
 import com.naribackend.core.email.UserEmail;
+import lombok.Builder;
 
-public record TestUser(UserEmail email, String rawPassword, String accessToken) {
+@Builder
+public record TestUser(
+        Long id,
+        UserEmail email,
+        String rawPassword,
+        String accessToken
+) {
 }

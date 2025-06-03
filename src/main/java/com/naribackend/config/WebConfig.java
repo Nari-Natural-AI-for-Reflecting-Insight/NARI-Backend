@@ -1,6 +1,7 @@
 package com.naribackend.config;
 
-import com.naribackend.api.CurrentUserArgumentResolver;
+import com.naribackend.api.LoginUserArgumentResolver;
+import com.naribackend.api.OpsLoginUserArgumentResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,7 +15,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WebConfig  implements WebMvcConfigurer {
 
-    private final CurrentUserArgumentResolver currentUserArgumentResolver;
+    private final LoginUserArgumentResolver loginUserArgumentResolver;
+
+    private final OpsLoginUserArgumentResolver opsLoginUserArgumentResolver;
 
     /**
      * ForwardedHeaderFilter is used to handle the X-Forwarded-* headers
@@ -29,6 +32,7 @@ public class WebConfig  implements WebMvcConfigurer {
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-        resolvers.add(currentUserArgumentResolver);
+        resolvers.add(loginUserArgumentResolver);
+        resolvers.add(opsLoginUserArgumentResolver);
     }
 }

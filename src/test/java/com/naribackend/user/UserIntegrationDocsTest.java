@@ -7,7 +7,6 @@ import com.naribackend.core.auth.*;
 import com.naribackend.support.ApiResponseDocs;
 import com.naribackend.support.TestUser;
 import com.naribackend.support.TestUserFactory;
-import com.naribackend.support.TestUserSupportConfig;
 import com.naribackend.support.error.CoreException;
 import com.naribackend.support.error.ErrorType;
 import org.junit.jupiter.api.DisplayName;
@@ -18,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.context.ActiveProfiles;
@@ -36,7 +34,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureRestDocs
 @AutoConfigureMockMvc
-@Import(TestUserSupportConfig.class)
 public class UserIntegrationDocsTest {
 
     @Autowired
