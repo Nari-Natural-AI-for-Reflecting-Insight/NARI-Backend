@@ -2,24 +2,28 @@ package com.naribackend.support;
 
 import com.naribackend.core.auth.*;
 import com.naribackend.core.email.UserEmail;
+import com.naribackend.support.error.CoreException;
+import com.naribackend.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
+@Component
 @RequiredArgsConstructor
 public class TestUserFactory {
 
     private final UserAccountAppender appender;
     private final AuthService authService;
     private final UserPasswordEncoder encoder;
+    private final UserAccountRepository userAccountRepository;
 
     public TestUser createTestUser() {
         String uuid = UUID.randomUUID().toString().substring(0, 8);
         UserEmail email = UserEmail.from("tester_" + uuid + "@example.com");
         String rawPw = "newPassword123!";
 
-        EncodedUserPassword enc =
-                RawUserPassword.from(rawPw).encode(encoder);
+        EncodedUserPassword enc = RawUserPassword.from(rawPw).encode(encoder);
 
         appender.appendUserAccount(
                 email,
@@ -27,11 +31,19 @@ public class TestUserFactory {
                 UserNickname.from("tester")
         );
 
+        UserAccount userAccount = userAccountRepository.findByEmail(email)
+                .orElseThrow(() -> new CoreException(ErrorType.INVALID_EMAIL));
+
         String token = authService.createAccessToken(
                 email,
                 RawUserPassword.from(rawPw)
         );
 
-        return new TestUser(email, rawPw, token);
+        return TestUser.builder()
+                .id(userAccount.getId())
+                .email(email)
+                .rawPassword(rawPw)
+                .accessToken(token)
+                .build();
     }
 }
