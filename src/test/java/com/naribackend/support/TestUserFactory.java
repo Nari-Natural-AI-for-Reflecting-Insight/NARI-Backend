@@ -1,6 +1,9 @@
 package com.naribackend.support;
 
 import com.naribackend.core.auth.*;
+import com.naribackend.core.credit.Credit;
+import com.naribackend.core.credit.UserCredit;
+import com.naribackend.core.credit.UserCreditRepository;
 import com.naribackend.core.email.UserEmail;
 import com.naribackend.support.error.CoreException;
 import com.naribackend.support.error.ErrorType;
@@ -17,6 +20,7 @@ public class TestUserFactory {
     private final AuthService authService;
     private final UserPasswordEncoder encoder;
     private final UserAccountRepository userAccountRepository;
+    private final UserCreditRepository userCreditRepository;
 
     public TestUser createTestUser() {
         String uuid = UUID.randomUUID().toString().substring(0, 8);
@@ -45,5 +49,18 @@ public class TestUserFactory {
                 .rawPassword(rawPw)
                 .accessToken(token)
                 .build();
+    }
+
+    public TestUser createTestUserWithCredit(long creditAmount) {
+        TestUser testUser = createTestUser();
+
+        userCreditRepository.save(
+                UserCredit.builder()
+                    .userId(testUser.id())
+                    .credit(Credit.from(creditAmount))
+                    .build()
+        );
+
+        return testUser;
     }
 }

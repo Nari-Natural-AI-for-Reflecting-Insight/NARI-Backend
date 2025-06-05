@@ -60,7 +60,7 @@ public class TokenIntegrationDocsTest {
     public void create_realtime_token_success_docs() throws Exception {
 
         // given
-        TestUser testUser = testUserFactory.createTestUser();
+        TestUser testUser = testUserFactory.createTestUserWithCredit(10_000L);
         String accessToken = testUser.accessToken();
 
         // when & then
