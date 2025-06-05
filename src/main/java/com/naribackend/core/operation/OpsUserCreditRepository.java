@@ -8,5 +8,5 @@ public interface OpsUserCreditRepository {
 
     OpsUserCredit save(OpsUserCredit opsUserCredit);
 
-    int addCredit(long userId, long creditAmount);
+    int chargeCredit(long userId, long creditAmount);
 }

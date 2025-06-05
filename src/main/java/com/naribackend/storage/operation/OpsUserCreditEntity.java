@@ -23,7 +23,7 @@ public class OpsUserCreditEntity extends BaseEntity {
     private Long userId;
 
     @Column(name = "credit_amount", nullable = false)
-    private Long creditAmount;
+    private long creditAmount;
 
     public static OpsUserCreditEntity from(final OpsUserCredit opsUserCredit) {
         return OpsUserCreditEntity.builder()

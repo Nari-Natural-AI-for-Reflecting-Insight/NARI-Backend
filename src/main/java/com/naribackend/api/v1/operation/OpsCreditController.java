@@ -30,7 +30,7 @@ public class OpsCreditController {
         @Parameter(hidden = true) @CurrentUser final OpsLoginUser opsLoginUser,
         @RequestBody @Valid final OpsChargeCreditRequest request
     ) {
-        opsCreditService.chargeCredit(opsLoginUser, request.email(), request.creditAmount(), request.toAdminCreditReason());
+        opsCreditService.chargeCredit(opsLoginUser, request.email(), request.creditAmount(), request.toOpsCreditReason());
 
         return ApiResponse.success();
     }

@@ -22,8 +22,8 @@ public class OpsUserCreditAppender {
             backoff = @Backoff(delay = 500, multiplier = 1.5, maxDelay = 1000)
     )
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void appendCredit(final long targetUserId, final long creditAmount) {
-        boolean updated = opsUserCreditRepository.addCredit(targetUserId, creditAmount) > 0;
+    public void chargeCredit(final long targetUserId, final long creditAmount) {
+        boolean updated = opsUserCreditRepository.chargeCredit(targetUserId, creditAmount) > 0;
 
         if (!updated) {
             createNewCredit(targetUserId, creditAmount);

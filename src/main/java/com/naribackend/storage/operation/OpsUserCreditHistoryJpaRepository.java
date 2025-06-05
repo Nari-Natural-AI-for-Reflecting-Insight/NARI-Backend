@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface OpsUserCreditHistoryJpaRepository extends JpaRepository<OpsUserCreditHistoryEntity, Long> {
 
-    List<OpsUserCreditHistoryEntity> findAllByModifiedUserId(long userId);
+    List<OpsUserCreditHistoryEntity> findAllByCreatedUserId(long userId);
 }

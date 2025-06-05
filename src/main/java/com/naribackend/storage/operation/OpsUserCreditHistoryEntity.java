@@ -1,6 +1,6 @@
 package com.naribackend.storage.operation;
 
-import com.naribackend.core.operation.OpsCreditReason;
+import com.naribackend.core.common.CreditOperationReason;
 import com.naribackend.core.operation.OpsUserCreditHistory;
 import com.naribackend.storage.BaseEntity;
 import jakarta.persistence.*;
@@ -20,36 +20,36 @@ public class OpsUserCreditHistoryEntity extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "operation_id", nullable = false, updatable = false)
-    private long operationId;
+    @Column(name = "operation_id", updatable = false)
+    private Long operationId;
 
-    @Column(name = "modified_user_id", nullable = false, updatable = false)
-    private long modifiedUserId;
+    @Column(name = "created_user_id", nullable = false, updatable = false)
+    private Long createdUserId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "reason", nullable = false, updatable = false)
-    private OpsCreditReason reason;
+    private CreditOperationReason reason;
 
-    @Column(name = "amount_changed", nullable = false, updatable = false)
-    private long amountChanged;
+    @Column(name = "changed_credit_amount", nullable = false, updatable = false)
+    private long changedCreditAmount;
 
     public static OpsUserCreditHistoryEntity from(final OpsUserCreditHistory opsUserCreditHistory) {
         return OpsUserCreditHistoryEntity.builder()
                 .id(opsUserCreditHistory.getId())
                 .operationId(opsUserCreditHistory.getOperationId())
-                .modifiedUserId(opsUserCreditHistory.getModifiedUserId())
+                .createdUserId(opsUserCreditHistory.getCreatedUserId())
                 .reason(opsUserCreditHistory.getReason())
-                .amountChanged(opsUserCreditHistory.getAmountChanged())
+                .changedCreditAmount(opsUserCreditHistory.getChangedCreditAmount())
                 .build();
     }
 
-    public OpsUserCreditHistory toDomain() {
+    public OpsUserCreditHistory toOpsUserCreditHistory() {
         return OpsUserCreditHistory.builder()
                 .id(this.id)
                 .operationId(this.operationId)
-                .modifiedUserId(this.modifiedUserId)
+                .createdUserId(this.createdUserId)
                 .reason(this.reason)
-                .amountChanged(this.amountChanged)
+                .changedCreditAmount(this.changedCreditAmount)
                 .build();
     }
 }

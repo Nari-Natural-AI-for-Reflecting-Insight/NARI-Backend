@@ -1,5 +1,6 @@
 package com.naribackend.core.operation;
 
+import com.naribackend.core.common.CreditOperationReason;
 import com.naribackend.storage.operation.OpsUserCreditAppender;
 import com.naribackend.support.error.CoreException;
 import com.naribackend.support.error.ErrorType;
@@ -17,14 +18,14 @@ public class OpsCreditService {
 
     private final OpsUserCreditHistoryRepository opsUserCreditHistoryRepository;
 
-    private final OpsUserCreditAppender opsUserCreditAppender;
+    private final OpsUserCreditAppender opsUserCreditModifier;
 
     @Transactional
     public void chargeCredit(
             final OpsLoginUser opsLoginUser,
             final String targetEmail,
-            final long creditAmount,
-            final OpsCreditReason reason
+            final long changedCreditAmount,
+            final CreditOperationReason reason
     ) {
         OpsUserAccount targetUserAccount = opsUserAccountRepository.findByEmail(targetEmail)
                 .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_USER));
@@ -34,21 +35,21 @@ public class OpsCreditService {
             throw new CoreException(ErrorType.USER_WITHDRAWN);
         }
 
-        opsUserCreditAppender.appendCredit(
+        opsUserCreditModifier.chargeCredit(
                 targetUserAccount.getId(),
-                creditAmount
+                changedCreditAmount
         );
 
         OpsUserCreditHistory userCreditHistory = OpsUserCreditHistory.of(
                 opsLoginUser,
                 targetUserAccount,
                 reason,
-                creditAmount
+                changedCreditAmount
         );
 
         opsUserCreditHistoryRepository.save(userCreditHistory);
 
         log.info("chargeCredit: user={} amount={} reason={} operator={}",
-                targetUserAccount.getId(), creditAmount, reason, targetUserAccount.getId());
+                targetUserAccount.getId(), changedCreditAmount, reason, targetUserAccount.getId());
     }
 }

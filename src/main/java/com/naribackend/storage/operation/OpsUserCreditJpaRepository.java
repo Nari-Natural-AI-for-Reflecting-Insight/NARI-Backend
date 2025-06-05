@@ -16,5 +16,5 @@ public interface OpsUserCreditJpaRepository extends JpaRepository<OpsUserCreditE
                     set c.creditAmount = c.creditAmount + :amount
                 where c.userId = :userId
             """)
-    int addCredit(Long userId, long amount);
+    int chargeCredit(Long userId, long amount);
 }
