@@ -94,6 +94,7 @@ public class OpsCreditIntegrationTest {
 
         // 크레딧 충전 이력 검증
         List<OpsUserCreditHistory> creditHistories = opsUserCreditHistoryRepository.findAllByUserId(targetTestUser.id());
+
         assertThat(creditHistories)
                 .hasSize(1)
                 .allSatisfy(history -> {
@@ -101,6 +102,8 @@ public class OpsCreditIntegrationTest {
                     assertThat(history.getReason()).isEqualTo(CREDIT_REASON);
                     assertThat(history.getOperationId()).isEqualTo(opsTestUser.id());
                     assertThat(history.getCreatedUserId()).isEqualTo(targetTestUser.id());
+
+                    assertThat(history.getCurrentCreditAmount()).isEqualTo(expectedCreditAmount);
                 });
     }
 
@@ -145,6 +148,8 @@ public class OpsCreditIntegrationTest {
         assertThat(actual).isEqualTo(expectedCredit);
 
         // 크레딧 충전 이력 검증
+        long preCurrentCreditAmount = 0L;
+
         List<OpsUserCreditHistory> creditHistories = opsUserCreditHistoryRepository.findAllByUserId(targetTestUser.id());
         assertThat(creditHistories)
                 .hasSize(numberOfRequests)
@@ -154,6 +159,13 @@ public class OpsCreditIntegrationTest {
                     assertThat(history.getOperationId()).isEqualTo(opsTestUser.id());
                     assertThat(history.getCreatedUserId()).isEqualTo(targetTestUser.id());
                 });
+
+        // 충전 이력의 현재 크레딧 금액이 요청당 충전 금액만큼 증가하는지 검증
+        for(OpsUserCreditHistory history : creditHistories) {
+            long diffPreCurrentCreditAmount = history.getCurrentCreditAmount() - preCurrentCreditAmount;
+            assertThat(diffPreCurrentCreditAmount).isEqualTo(creditPerRequest);
+            preCurrentCreditAmount = history.getCurrentCreditAmount();
+        }
     }
 
     @ParameterizedTest(name = "{index} ⇒ {0}원 충전 실패 - 잘못된 충전 금액")
@@ -339,6 +351,14 @@ public class OpsCreditIntegrationTest {
                     assertThat(history.getOperationId()).isEqualTo(opsTestUser.id());
                     assertThat(history.getCreatedUserId()).isEqualTo(targetTestUser.id());
                 });
+
+        // 충전 이력의 현재 크레딧 금액이 요청당 충전 금액만큼 증가하는지 검증
+        long preCurrentCreditAmount = 0L;
+        for(OpsUserCreditHistory history : creditHistories) {
+            long diffPreCurrentCreditAmount = history.getCurrentCreditAmount() - preCurrentCreditAmount;
+            assertThat(diffPreCurrentCreditAmount).isEqualTo(creditAmountPerRequest);
+            preCurrentCreditAmount = history.getCurrentCreditAmount();
+        }
     }
 
     private void executeConcurrentRequests(final int threadCount, Runnable task) throws InterruptedException {
