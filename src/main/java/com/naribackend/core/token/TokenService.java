@@ -1,6 +1,7 @@
 package com.naribackend.core.token;
 
 import com.naribackend.core.auth.LoginUser;
+import com.naribackend.core.credit.Credit;
 import com.naribackend.core.credit.SubtractCreditOperation;
 import com.naribackend.core.credit.UserCreditHistoryAppender;
 import com.naribackend.core.credit.UserCreditModifier;
@@ -22,7 +23,7 @@ public class TokenService {
     public RealtimeTokenInfo createTokenInfo(final LoginUser loginUser) {
 
         var subtractOperation = SubtractCreditOperation.REALTIME_ACCESS_TOKEN;
-        userCreditModifier.subtractCredit(
+        Credit currentCredit = userCreditModifier.subtractCredit(
                 loginUser.getId(),
                 subtractOperation
         );
@@ -30,7 +31,8 @@ public class TokenService {
         userCreditHistoryAppender.append(
                 loginUser.getId(),
                 subtractOperation.toReason(),
-                subtractOperation.toCreditAsLong()
+                -subtractOperation.getCreditAmountToSubtract(),
+                currentCredit
         );
 
         var tokenInfo = realtimeTokenInfoCreator.createTokenInfo();

@@ -22,7 +22,11 @@ public enum SubtractCreditOperation {
         return creditOperationReason;
     }
 
-    public Long toCreditAsLong() {
-        return creditToSubtract.toLong();
+    public Credit getCreditToSubtract() {
+        return creditToSubtract.copy();
+    }
+
+    public long getCreditAmountToSubtract() {
+        return creditToSubtract.toCreditAmount();
     }
 }

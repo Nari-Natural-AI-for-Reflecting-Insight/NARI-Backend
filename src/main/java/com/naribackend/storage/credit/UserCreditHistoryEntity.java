@@ -1,6 +1,7 @@
 package com.naribackend.storage.credit;
 
 import com.naribackend.core.common.CreditOperationReason;
+import com.naribackend.core.credit.Credit;
 import com.naribackend.core.credit.UserCreditHistory;
 import com.naribackend.storage.BaseEntity;
 import jakarta.persistence.*;
@@ -30,6 +31,9 @@ public class UserCreditHistoryEntity extends BaseEntity {
     @Column(name = "changed_credit_amount", nullable = false, updatable = false)
     private long changedCreditAmount;
 
+    @Column(name = "current_credit_amount", nullable = false, updatable = false)
+    private long currentCreditAmount;
+
     public static UserCreditHistoryEntity from(
             final UserCreditHistory userCreditHistory
     ) {
@@ -38,6 +42,7 @@ public class UserCreditHistoryEntity extends BaseEntity {
                 .createdUserId(userCreditHistory.getCreatedUserId())
                 .reason(userCreditHistory.getReason())
                 .changedCreditAmount(userCreditHistory.getChangedCreditAmount())
+                .currentCreditAmount(userCreditHistory.getCurrentCredit().toCreditAmount())
                 .build();
     }
 
@@ -47,6 +52,7 @@ public class UserCreditHistoryEntity extends BaseEntity {
                 .createdUserId(this.createdUserId)
                 .reason(this.reason)
                 .changedCreditAmount(this.changedCreditAmount)
+                .currentCredit(Credit.from(this.currentCreditAmount))
                 .build();
     }
 }

@@ -24,7 +24,7 @@ public class OpsCreditService {
     public void chargeCredit(
             final OpsLoginUser opsLoginUser,
             final String targetEmail,
-            final long changedCreditAmount,
+            final long creditAmountToCharge,
             final CreditOperationReason reason
     ) {
         OpsUserAccount targetUserAccount = opsUserAccountRepository.findByEmail(targetEmail)
@@ -35,21 +35,22 @@ public class OpsCreditService {
             throw new CoreException(ErrorType.USER_WITHDRAWN);
         }
 
-        opsUserCreditModifier.chargeCredit(
+        OpsUserCredit chargedOpsUserCredit = opsUserCreditModifier.chargeCredit(
                 targetUserAccount.getId(),
-                changedCreditAmount
+                creditAmountToCharge
         );
 
         OpsUserCreditHistory userCreditHistory = OpsUserCreditHistory.of(
                 opsLoginUser,
                 targetUserAccount,
                 reason,
-                changedCreditAmount
+                creditAmountToCharge,
+                chargedOpsUserCredit.getCredit()
         );
 
         opsUserCreditHistoryRepository.save(userCreditHistory);
 
         log.info("chargeCredit: user={} amount={} reason={} operator={}",
-                targetUserAccount.getId(), changedCreditAmount, reason, targetUserAccount.getId());
+                targetUserAccount.getId(), creditAmountToCharge, reason, targetUserAccount.getId());
     }
 }

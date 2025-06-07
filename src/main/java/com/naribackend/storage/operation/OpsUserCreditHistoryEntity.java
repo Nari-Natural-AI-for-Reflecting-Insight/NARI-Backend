@@ -33,6 +33,9 @@ public class OpsUserCreditHistoryEntity extends BaseEntity {
     @Column(name = "changed_credit_amount", nullable = false, updatable = false)
     private long changedCreditAmount;
 
+    @Column(name = "current_credit_amount", nullable = false, updatable = false)
+    private long currentCreditAmount;
+
     public static OpsUserCreditHistoryEntity from(final OpsUserCreditHistory opsUserCreditHistory) {
         return OpsUserCreditHistoryEntity.builder()
                 .id(opsUserCreditHistory.getId())
@@ -40,6 +43,7 @@ public class OpsUserCreditHistoryEntity extends BaseEntity {
                 .createdUserId(opsUserCreditHistory.getCreatedUserId())
                 .reason(opsUserCreditHistory.getReason())
                 .changedCreditAmount(opsUserCreditHistory.getChangedCreditAmount())
+                .currentCreditAmount(opsUserCreditHistory.getCurrentCreditAmount())
                 .build();
     }
 
@@ -50,6 +54,7 @@ public class OpsUserCreditHistoryEntity extends BaseEntity {
                 .createdUserId(this.createdUserId)
                 .reason(this.reason)
                 .changedCreditAmount(this.changedCreditAmount)
+                .currentCreditAmount(this.currentCreditAmount)
                 .build();
     }
 }

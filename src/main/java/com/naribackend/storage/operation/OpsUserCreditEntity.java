@@ -25,19 +25,25 @@ public class OpsUserCreditEntity extends BaseEntity {
     @Column(name = "credit_amount", nullable = false)
     private long creditAmount;
 
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version;
+
     public static OpsUserCreditEntity from(final OpsUserCredit opsUserCredit) {
         return OpsUserCreditEntity.builder()
                 .id(opsUserCredit.getId())
                 .userId(opsUserCredit.getUserId())
                 .creditAmount(opsUserCredit.getCredit())
+                .version(opsUserCredit.getVersion())
                 .build();
     }
 
     public OpsUserCredit toOpsUserCredit() {
         return OpsUserCredit.builder()
-                .id(id)
-                .userId(userId)
-                .credit(creditAmount)
+                .id(this.id)
+                .userId(this.userId)
+                .credit(this.creditAmount)
+                .version(this.version)
                 .build();
     }
 }

@@ -10,23 +10,21 @@ public class UserCredit {
     private final Long id;
     private final long userId;
     private Credit credit;
-
-    public static UserCredit newZeroCreditFor(final long userId) {
-        return UserCredit.builder()
-                .userId(userId)
-                .credit(Credit.newZeroCredit())
-                .build();
-    }
-
-    public boolean hasNegativeCredit() {
-        return this.credit.isNegative();
-    }
+    private final Long version;
 
     public void execute(final SubtractCreditOperation operation) {
         this.credit = operation.execute(this.credit);
     }
 
-    public long getCreditAsLong() {
-        return credit.toLong();
+    public long getCreditAmount() {
+        return credit.toCreditAmount();
+    }
+
+    public boolean hasLessThan(Credit credit) {
+        return credit.isLessThan(credit);
+    }
+
+    public Credit currentCredit() {
+        return this.credit;
     }
 }

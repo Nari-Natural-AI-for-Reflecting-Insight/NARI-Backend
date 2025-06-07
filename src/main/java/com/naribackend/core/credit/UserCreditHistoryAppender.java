@@ -13,12 +13,14 @@ public class UserCreditHistoryAppender {
     public void append(
             final Long createdUserId,
             final CreditOperationReason reason,
-            final long changedCreditAmount
+            final long changedCreditAmount,
+            final Credit currentCredit
     ) {
         UserCreditHistory userCreditHistory = UserCreditHistory.of(
                 createdUserId,
                 reason,
-                changedCreditAmount
+                changedCreditAmount,
+                currentCredit
         );
 
         userCreditHistoryRepository.save(userCreditHistory);

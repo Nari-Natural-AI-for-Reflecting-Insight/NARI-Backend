@@ -14,17 +14,20 @@ public class UserCreditHistory {
     private final Long createdUserId;
     private final CreditOperationReason reason;
     private final long changedCreditAmount;
+    private final Credit currentCredit;
     private final LocalDateTime createdAt;
 
     public static UserCreditHistory of(
             Long createdUserId,
             CreditOperationReason reason,
-            long changedCreditAmount
+            long changedCreditAmount,
+            Credit currentCredit
     ) {
         return UserCreditHistory.builder()
                 .createdUserId(createdUserId)
                 .reason(reason)
                 .changedCreditAmount(changedCreditAmount)
+                .currentCredit(currentCredit)
                 .build();
     }
 }
