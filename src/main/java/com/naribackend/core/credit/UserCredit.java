@@ -21,7 +21,7 @@ public class UserCredit {
     }
 
     public boolean hasLessThan(Credit credit) {
-        return credit.isLessThan(credit);
+        return this.credit.isLessThan(credit);
     }
 
     public Credit currentCredit() {

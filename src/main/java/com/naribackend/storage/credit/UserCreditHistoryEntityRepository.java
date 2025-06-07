@@ -5,8 +5,7 @@ import com.naribackend.core.credit.UserCreditHistoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
-
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -21,9 +20,11 @@ public class UserCreditHistoryEntityRepository implements UserCreditHistoryRepos
     }
 
     @Override
-    public Optional<UserCreditHistory> findByUserId(Long userId) {
+    public List<UserCreditHistory> findAllByUserId(Long userId) {
         return userCreditHistoryJpaRepository
-                .findByCreatedUserId(userId)
-                .map(UserCreditHistoryEntity::toUserCreditHistory);
+                .findAllByCreatedUserId(userId)
+                .stream()
+                .map(UserCreditHistoryEntity::toUserCreditHistory)
+                .toList();
     }
 }

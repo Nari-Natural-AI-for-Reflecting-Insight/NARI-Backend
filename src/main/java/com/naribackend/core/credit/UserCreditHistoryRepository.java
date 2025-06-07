@@ -1,10 +1,10 @@
 package com.naribackend.core.credit;
 
-import java.util.Optional;
+import java.util.List;
 
 public interface UserCreditHistoryRepository {
 
     void save(UserCreditHistory userCreditHistory);
 
-    Optional<UserCreditHistory> findByUserId(Long userId);
+    List<UserCreditHistory> findAllByUserId(Long userId);
 }

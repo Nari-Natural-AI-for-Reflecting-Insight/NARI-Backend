@@ -9,6 +9,8 @@ import com.naribackend.support.error.CoreException;
 import com.naribackend.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -22,6 +24,7 @@ public class TestUserFactory {
     private final UserAccountRepository userAccountRepository;
     private final UserCreditRepository userCreditRepository;
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public TestUser createTestUser() {
         String uuid = UUID.randomUUID().toString().substring(0, 8);
         UserEmail email = UserEmail.from("tester_" + uuid + "@example.com");
@@ -51,6 +54,7 @@ public class TestUserFactory {
                 .build();
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public TestUser createTestUserWithCredit(long creditAmount) {
         TestUser testUser = createTestUser();
 
