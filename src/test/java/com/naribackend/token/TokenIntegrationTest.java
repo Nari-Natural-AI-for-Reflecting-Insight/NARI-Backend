@@ -1,7 +1,6 @@
 package com.naribackend.token;
 
 import com.naribackend.core.common.CreditOperationReason;
-import com.naribackend.core.credit.Credit;
 import com.naribackend.core.credit.UserCreditHistory;
 import com.naribackend.core.credit.UserCreditHistoryRepository;
 import com.naribackend.core.credit.UserCreditRepository;
@@ -87,7 +86,7 @@ public class TokenIntegrationTest {
         // given
         TestUser testUser = testUserFactory.createTestUserWithCredit(userCreditAmount);
         String accessToken = testUser.accessToken();
-        long expectedUserCreditAmount = 10_000L - TOKEN_COST_PER_REQUEST;
+        long expectedUserCreditAmount = userCreditAmount - TOKEN_COST_PER_REQUEST;
 
         // when & then
         mockMvc.perform(
@@ -132,9 +131,10 @@ public class TokenIntegrationTest {
 
         // then
         // 크레딧이 차감되지 않았는지 검증
-        Credit actualUserCreditAmount = userCreditRepository.getUserCredit(testUser.id())
+        long actualUserCreditAmount = userCreditRepository.getUserCredit(testUser.id())
                 .orElseThrow()
-                .getCredit();
+                .getCredit()
+                .creditAmount();
 
         assertThat(actualUserCreditAmount).isEqualTo(expectedUserCreditAmount);
     }
