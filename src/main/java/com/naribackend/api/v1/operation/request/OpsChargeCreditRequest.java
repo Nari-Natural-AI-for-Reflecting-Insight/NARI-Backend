@@ -1,6 +1,6 @@
 package com.naribackend.api.v1.operation.request;
 
-import com.naribackend.core.operation.OpsCreditReason;
+import com.naribackend.core.common.CreditOperationReason;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Max;
@@ -22,9 +22,9 @@ public record OpsChargeCreditRequest(
 
     @NotBlank(message = "충전 사유 코드 필수입니다.")
     @Schema(description = "크레딧 충전 사유 코드", example = "OPS_CREDIT_FOR_TEST")
-    String creditReason
+    String creditOperationReason
 ){
-    public OpsCreditReason toAdminCreditReason() {
-        return OpsCreditReason.from(creditReason);
+    public CreditOperationReason toOpsCreditReason() {
+        return CreditOperationReason.from(creditOperationReason);
     }
 }

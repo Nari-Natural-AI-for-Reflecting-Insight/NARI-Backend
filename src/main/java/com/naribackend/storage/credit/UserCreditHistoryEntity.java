@@ -1,7 +1,8 @@
-package com.naribackend.storage.operation;
+package com.naribackend.storage.credit;
 
 import com.naribackend.core.common.CreditOperationReason;
-import com.naribackend.core.operation.OpsUserCreditHistory;
+import com.naribackend.core.credit.Credit;
+import com.naribackend.core.credit.UserCreditHistory;
 import com.naribackend.storage.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -14,14 +15,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Table(name = "user_credit_history")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class OpsUserCreditHistoryEntity extends BaseEntity {
+public class UserCreditHistoryEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(name = "operation_id", updatable = false)
-    private Long operationId;
 
     @Column(name = "created_user_id", nullable = false, updatable = false)
     private Long createdUserId;
@@ -36,25 +34,25 @@ public class OpsUserCreditHistoryEntity extends BaseEntity {
     @Column(name = "current_credit_amount", nullable = false, updatable = false)
     private long currentCreditAmount;
 
-    public static OpsUserCreditHistoryEntity from(final OpsUserCreditHistory opsUserCreditHistory) {
-        return OpsUserCreditHistoryEntity.builder()
-                .id(opsUserCreditHistory.getId())
-                .operationId(opsUserCreditHistory.getOperationId())
-                .createdUserId(opsUserCreditHistory.getCreatedUserId())
-                .reason(opsUserCreditHistory.getReason())
-                .changedCreditAmount(opsUserCreditHistory.getChangedCreditAmount())
-                .currentCreditAmount(opsUserCreditHistory.getCurrentCreditAmount())
+    public static UserCreditHistoryEntity from(
+            final UserCreditHistory userCreditHistory
+    ) {
+        return UserCreditHistoryEntity.builder()
+                .id(userCreditHistory.getId())
+                .createdUserId(userCreditHistory.getCreatedUserId())
+                .reason(userCreditHistory.getReason())
+                .changedCreditAmount(userCreditHistory.getChangedCreditAmount())
+                .currentCreditAmount(userCreditHistory.getCurrentCredit().toCreditAmount())
                 .build();
     }
 
-    public OpsUserCreditHistory toOpsUserCreditHistory() {
-        return OpsUserCreditHistory.builder()
+    public UserCreditHistory toUserCreditHistory() {
+        return UserCreditHistory.builder()
                 .id(this.id)
-                .operationId(this.operationId)
                 .createdUserId(this.createdUserId)
                 .reason(this.reason)
                 .changedCreditAmount(this.changedCreditAmount)
-                .currentCreditAmount(this.currentCreditAmount)
+                .currentCredit(Credit.from(this.currentCreditAmount))
                 .build();
     }
 }

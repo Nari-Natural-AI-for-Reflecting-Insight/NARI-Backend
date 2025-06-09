@@ -1,4 +1,4 @@
-package com.naribackend.core.operation;
+package com.naribackend.core.credit;
 
 import com.naribackend.core.common.CreditOperationReason;
 import lombok.Builder;
@@ -8,29 +8,26 @@ import java.time.LocalDateTime;
 
 @Getter
 @Builder
-public class OpsUserCreditHistory {
+public class UserCreditHistory {
 
     private final Long id;
-    private final Long operationId;
     private final Long createdUserId;
     private final CreditOperationReason reason;
     private final long changedCreditAmount;
+    private final Credit currentCredit;
     private final LocalDateTime createdAt;
-    private final long currentCreditAmount;
 
-    public static OpsUserCreditHistory of(
-            OpsLoginUser opsLoginUser,
-            OpsUserAccount targetUserAccount,
+    public static UserCreditHistory of(
+            Long createdUserId,
             CreditOperationReason reason,
             long changedCreditAmount,
-            long currentCreditAmount
+            Credit currentCredit
     ) {
-        return OpsUserCreditHistory.builder()
-                .operationId(opsLoginUser.getId())
-                .createdUserId(targetUserAccount.getId())
+        return UserCreditHistory.builder()
+                .createdUserId(createdUserId)
                 .reason(reason)
                 .changedCreditAmount(changedCreditAmount)
-                .currentCreditAmount(currentCreditAmount)
+                .currentCredit(currentCredit)
                 .build();
     }
 }

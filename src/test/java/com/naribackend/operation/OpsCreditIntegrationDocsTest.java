@@ -2,7 +2,7 @@ package com.naribackend.operation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.naribackend.api.v1.operation.request.OpsChargeCreditRequest;
-import com.naribackend.core.operation.OpsCreditReason;
+import com.naribackend.core.common.CreditOperationReason;
 import com.naribackend.core.operation.OpsUserCreditHistory;
 import com.naribackend.core.operation.OpsUserCreditHistoryRepository;
 import com.naribackend.core.operation.OpsUserCreditRepository;
@@ -35,17 +35,22 @@ public class OpsCreditIntegrationDocsTest {
 
     private static final String CHARGE_CREDIT_PATH = "/api/v1/ops/credit/charge";
 
-    private static final OpsCreditReason CREDIT_REASON = OpsCreditReason.OPS_CREDIT_FOR_TEST;
+    private static final CreditOperationReason CREDIT_REASON = CreditOperationReason.OPS_CREDIT_FOR_TEST;
 
     private static final String CREDIT_REASON_STR = CREDIT_REASON.toString();
+
     @Autowired
     ObjectMapper objectMapper;
+
     @Autowired
     OpsTestUserFactory opsTestUserFactory;
+
     @Autowired
     OpsUserCreditRepository opsUserCreditRepository;
+
     @Autowired
     OpsUserCreditHistoryRepository opsUserCreditHistoryRepository;
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -62,7 +67,7 @@ public class OpsCreditIntegrationDocsTest {
         OpsChargeCreditRequest request = OpsChargeCreditRequest.builder()
                 .email(targetTestUser.email())
                 .creditAmount(expectedCreditAmount)
-                .creditReason(CREDIT_REASON_STR)
+                .creditOperationReason(CREDIT_REASON_STR)
                 .build();
 
         // when & then
@@ -90,10 +95,10 @@ public class OpsCreditIntegrationDocsTest {
         assertThat(creditHistories)
                 .hasSize(1)
                 .allSatisfy(history -> {
-                    assertThat(history.getAmountChanged()).isEqualTo(expectedCreditAmount);
+                    assertThat(history.getChangedCreditAmount()).isEqualTo(expectedCreditAmount);
                     assertThat(history.getReason()).isEqualTo(CREDIT_REASON);
                     assertThat(history.getOperationId()).isEqualTo(opsTestUser.id());
-                    assertThat(history.getModifiedUserId()).isEqualTo(targetTestUser.id());
+                    assertThat(history.getCreatedUserId()).isEqualTo(targetTestUser.id());
                 });
     }
 }

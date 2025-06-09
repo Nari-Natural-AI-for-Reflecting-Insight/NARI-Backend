@@ -9,5 +9,5 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class OpsLoginUser {
 
-    private final long id;
+    private final Long id;
 }

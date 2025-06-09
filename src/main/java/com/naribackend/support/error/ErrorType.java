@@ -28,7 +28,10 @@ public enum ErrorType {
     INVALID_CHARGE_REASON(HttpStatus.BAD_REQUEST, ErrorCode.E400, "잘못된 CHARGE REASON 입니다.", LogLevel.DEBUG),
     NOT_FOUND_OPS_USER(HttpStatus.FORBIDDEN, ErrorCode.E403, "관리자가 아니면 접근할 수 없습니다.", LogLevel.DEBUG),
     INVALID_CHARGE_AMOUNT(HttpStatus.BAD_REQUEST, ErrorCode.E400, "잘못된 충전 금액입니다.", LogLevel.DEBUG),
-    USER_WITHDRAWN(HttpStatus.BAD_REQUEST, ErrorCode.E400, "탈퇴한 사용자입니다.", LogLevel.ERROR)
+    USER_WITHDRAWN(HttpStatus.BAD_REQUEST, ErrorCode.E400, "탈퇴한 사용자입니다.", LogLevel.ERROR),
+    INVALID_CREDIT_AMOUNT(HttpStatus.BAD_REQUEST, ErrorCode.E400, "잘못된 크레딧 금액입니다.", LogLevel.DEBUG),
+    NOT_SUFFICIENT_CREDIT(HttpStatus.UNPROCESSABLE_ENTITY, ErrorCode.E422, "충전 금액이 부족합니다.", LogLevel.DEBUG),
+    INVALID_CREDIT_OPERATION(HttpStatus.BAD_REQUEST, ErrorCode.E400, "잘못된 크레딧 연산입니다.", LogLevel.DEBUG),
 
     ;
 

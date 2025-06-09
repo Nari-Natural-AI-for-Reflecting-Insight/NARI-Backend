@@ -1,6 +1,10 @@
 package com.naribackend.core.token;
 
 import com.naribackend.core.auth.LoginUser;
+import com.naribackend.core.credit.Credit;
+import com.naribackend.core.credit.SubtractCreditOperation;
+import com.naribackend.core.credit.UserCreditHistoryAppender;
+import com.naribackend.core.credit.UserCreditModifier;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +16,24 @@ public class TokenService {
 
     private final RealtimeTokenHistoryRepository realtimeTokenHistoryRepository;
 
+    private final UserCreditModifier userCreditModifier;
+
+    private final UserCreditHistoryAppender userCreditHistoryAppender;
+
     public RealtimeTokenInfo createTokenInfo(final LoginUser loginUser) {
+
+        var subtractOperation = SubtractCreditOperation.REALTIME_ACCESS_TOKEN;
+        Credit currentCredit = userCreditModifier.subtractCredit(
+                loginUser.getId(),
+                subtractOperation
+        );
+
+        userCreditHistoryAppender.append(
+                loginUser.getId(),
+                subtractOperation.toReason(),
+                -subtractOperation.getCreditAmountToSubtract(),
+                currentCredit
+        );
 
         var tokenInfo = realtimeTokenInfoCreator.createTokenInfo();
 

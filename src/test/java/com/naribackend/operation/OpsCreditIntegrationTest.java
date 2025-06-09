@@ -2,6 +2,7 @@ package com.naribackend.operation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.naribackend.api.v1.operation.request.OpsChargeCreditRequest;
+import com.naribackend.core.common.CreditOperationReason;
 import com.naribackend.core.operation.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.RepeatedTest;
@@ -37,7 +38,7 @@ public class OpsCreditIntegrationTest {
 
     private static final String CHARGE_CREDIT_PATH = "/api/v1/ops/credit/charge";
 
-    private static final OpsCreditReason CREDIT_REASON = OpsCreditReason.OPS_CREDIT_FOR_TEST;
+    private static final CreditOperationReason CREDIT_REASON = CreditOperationReason.OPS_CREDIT_FOR_TEST;
 
     private static final String CREDIT_REASON_STR = CREDIT_REASON.toString();
 
@@ -72,7 +73,7 @@ public class OpsCreditIntegrationTest {
         OpsChargeCreditRequest request = OpsChargeCreditRequest.builder()
                 .email(targetTestUser.email())
                 .creditAmount(expectedCreditAmount)
-                .creditReason(CREDIT_REASON_STR)
+                .creditOperationReason(CREDIT_REASON_STR)
                 .build();
 
         // when & then
@@ -93,13 +94,16 @@ public class OpsCreditIntegrationTest {
 
         // 크레딧 충전 이력 검증
         List<OpsUserCreditHistory> creditHistories = opsUserCreditHistoryRepository.findAllByUserId(targetTestUser.id());
+
         assertThat(creditHistories)
                 .hasSize(1)
                 .allSatisfy(history -> {
-                    assertThat(history.getAmountChanged()).isEqualTo(expectedCreditAmount);
+                    assertThat(history.getChangedCreditAmount()).isEqualTo(expectedCreditAmount);
                     assertThat(history.getReason()).isEqualTo(CREDIT_REASON);
                     assertThat(history.getOperationId()).isEqualTo(opsTestUser.id());
-                    assertThat(history.getModifiedUserId()).isEqualTo(targetTestUser.id());
+                    assertThat(history.getCreatedUserId()).isEqualTo(targetTestUser.id());
+
+                    assertThat(history.getCurrentCreditAmount()).isEqualTo(expectedCreditAmount);
                 });
     }
 
@@ -124,7 +128,7 @@ public class OpsCreditIntegrationTest {
         OpsChargeCreditRequest req = OpsChargeCreditRequest.builder()
                 .email(targetTestUser.email())
                 .creditAmount(creditPerRequest)
-                .creditReason(CREDIT_REASON_STR)
+                .creditOperationReason(CREDIT_REASON_STR)
                 .build();
 
         // when & then
@@ -144,15 +148,24 @@ public class OpsCreditIntegrationTest {
         assertThat(actual).isEqualTo(expectedCredit);
 
         // 크레딧 충전 이력 검증
+        long preCurrentCreditAmount = 0L;
+
         List<OpsUserCreditHistory> creditHistories = opsUserCreditHistoryRepository.findAllByUserId(targetTestUser.id());
         assertThat(creditHistories)
                 .hasSize(numberOfRequests)
                 .allSatisfy(history -> {
-                    assertThat(history.getAmountChanged()).isEqualTo(creditPerRequest);
+                    assertThat(history.getChangedCreditAmount()).isEqualTo(creditPerRequest);
                     assertThat(history.getReason()).isEqualTo(CREDIT_REASON);
                     assertThat(history.getOperationId()).isEqualTo(opsTestUser.id());
-                    assertThat(history.getModifiedUserId()).isEqualTo(targetTestUser.id());
+                    assertThat(history.getCreatedUserId()).isEqualTo(targetTestUser.id());
                 });
+
+        // 충전 이력의 현재 크레딧 금액이 요청당 충전 금액만큼 증가하는지 검증
+        for(OpsUserCreditHistory history : creditHistories) {
+            long diffPreCurrentCreditAmount = history.getCurrentCreditAmount() - preCurrentCreditAmount;
+            assertThat(diffPreCurrentCreditAmount).isEqualTo(creditPerRequest);
+            preCurrentCreditAmount = history.getCurrentCreditAmount();
+        }
     }
 
     @ParameterizedTest(name = "{index} ⇒ {0}원 충전 실패 - 잘못된 충전 금액")
@@ -169,7 +182,7 @@ public class OpsCreditIntegrationTest {
         OpsChargeCreditRequest request = OpsChargeCreditRequest.builder()
                 .email(targetTestUser.email())
                 .creditAmount(invalidCreditAmount)
-                .creditReason(CREDIT_REASON_STR)
+                .creditOperationReason(CREDIT_REASON_STR)
                 .build();
 
         // when & then
@@ -207,7 +220,7 @@ public class OpsCreditIntegrationTest {
         OpsChargeCreditRequest request = OpsChargeCreditRequest.builder()
                 .email(targetTestUser.email())
                 .creditAmount(1_000L)
-                .creditReason(CREDIT_REASON_STR)
+                .creditOperationReason(CREDIT_REASON_STR)
                 .build();
 
         // when & then
@@ -244,7 +257,7 @@ public class OpsCreditIntegrationTest {
         OpsChargeCreditRequest request = OpsChargeCreditRequest.builder()
                 .email(targetTestUser.email())
                 .creditAmount(1_000L)
-                .creditReason("invalid charge reason") // 잘못된 충전 사유
+                .creditOperationReason("invalid charge reason") // 잘못된 충전 사유
                 .build();
 
         // when & then
@@ -281,7 +294,7 @@ public class OpsCreditIntegrationTest {
         OpsChargeCreditRequest request = OpsChargeCreditRequest.builder()
                 .email(withdrawnTestUser.email())
                 .creditAmount(1_000L)
-                .creditReason(CREDIT_REASON_STR)
+                .creditOperationReason(CREDIT_REASON_STR)
                 .build();
 
         // when & then
@@ -333,11 +346,19 @@ public class OpsCreditIntegrationTest {
         assertThat(creditHistories)
                 .hasSize(threadCount)
                 .allSatisfy(history -> {
-                    assertThat(history.getAmountChanged()).isEqualTo(creditAmountPerRequest);
+                    assertThat(history.getChangedCreditAmount()).isEqualTo(creditAmountPerRequest);
                     assertThat(history.getReason()).isEqualTo(CREDIT_REASON);
                     assertThat(history.getOperationId()).isEqualTo(opsTestUser.id());
-                    assertThat(history.getModifiedUserId()).isEqualTo(targetTestUser.id());
+                    assertThat(history.getCreatedUserId()).isEqualTo(targetTestUser.id());
                 });
+
+        // 충전 이력의 현재 크레딧 금액이 요청당 충전 금액만큼 증가하는지 검증
+        long preCurrentCreditAmount = 0L;
+        for(OpsUserCreditHistory history : creditHistories) {
+            long diffPreCurrentCreditAmount = history.getCurrentCreditAmount() - preCurrentCreditAmount;
+            assertThat(diffPreCurrentCreditAmount).isEqualTo(creditAmountPerRequest);
+            preCurrentCreditAmount = history.getCurrentCreditAmount();
+        }
     }
 
     private void executeConcurrentRequests(final int threadCount, Runnable task) throws InterruptedException {
@@ -367,7 +388,7 @@ public class OpsCreditIntegrationTest {
             OpsChargeCreditRequest req = OpsChargeCreditRequest.builder()
                     .email(targetUser.email())
                     .creditAmount(creditAmountPerRequest)
-                    .creditReason(CREDIT_REASON_STR)
+                    .creditOperationReason(CREDIT_REASON_STR)
                     .build();
 
             mockMvc.perform(post(CHARGE_CREDIT_PATH)

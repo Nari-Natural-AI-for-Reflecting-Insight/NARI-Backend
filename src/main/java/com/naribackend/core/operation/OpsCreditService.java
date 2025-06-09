@@ -1,5 +1,6 @@
 package com.naribackend.core.operation;
 
+import com.naribackend.core.common.CreditOperationReason;
 import com.naribackend.storage.operation.OpsUserCreditAppender;
 import com.naribackend.support.error.CoreException;
 import com.naribackend.support.error.ErrorType;
@@ -17,14 +18,14 @@ public class OpsCreditService {
 
     private final OpsUserCreditHistoryRepository opsUserCreditHistoryRepository;
 
-    private final OpsUserCreditAppender opsUserCreditAppender;
+    private final OpsUserCreditAppender opsUserCreditModifier;
 
     @Transactional
     public void chargeCredit(
             final OpsLoginUser opsLoginUser,
             final String targetEmail,
-            final long creditAmount,
-            final OpsCreditReason reason
+            final long creditAmountToCharge,
+            final CreditOperationReason reason
     ) {
         OpsUserAccount targetUserAccount = opsUserAccountRepository.findByEmail(targetEmail)
                 .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_USER));
@@ -34,21 +35,22 @@ public class OpsCreditService {
             throw new CoreException(ErrorType.USER_WITHDRAWN);
         }
 
-        opsUserCreditAppender.appendCredit(
+        OpsUserCredit chargedOpsUserCredit = opsUserCreditModifier.chargeCredit(
                 targetUserAccount.getId(),
-                creditAmount
+                creditAmountToCharge
         );
 
         OpsUserCreditHistory userCreditHistory = OpsUserCreditHistory.of(
                 opsLoginUser,
                 targetUserAccount,
                 reason,
-                creditAmount
+                creditAmountToCharge,
+                chargedOpsUserCredit.getCredit()
         );
 
         opsUserCreditHistoryRepository.save(userCreditHistory);
 
         log.info("chargeCredit: user={} amount={} reason={} operator={}",
-                targetUserAccount.getId(), creditAmount, reason, targetUserAccount.getId());
+                targetUserAccount.getId(), creditAmountToCharge, reason, targetUserAccount.getId());
     }
 }

@@ -2,6 +2,6 @@ package com.naribackend.support.response;
 
 public enum ResultType {
 
-    SUCCESS, ERROR
+    SUCCESS, ERROR, REJECTED
 
 }

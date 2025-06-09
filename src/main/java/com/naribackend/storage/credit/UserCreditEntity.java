@@ -1,6 +1,7 @@
-package com.naribackend.storage.operation;
+package com.naribackend.storage.credit;
 
-import com.naribackend.core.operation.OpsUserCredit;
+import com.naribackend.core.credit.Credit;
+import com.naribackend.core.credit.UserCredit;
 import com.naribackend.storage.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -13,7 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Table(name = "user_credit")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class OpsUserCreditEntity extends BaseEntity {
+public class UserCreditEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,20 +30,20 @@ public class OpsUserCreditEntity extends BaseEntity {
     @Column(name = "version", nullable = false)
     private Long version;
 
-    public static OpsUserCreditEntity from(final OpsUserCredit opsUserCredit) {
-        return OpsUserCreditEntity.builder()
-                .id(opsUserCredit.getId())
-                .userId(opsUserCredit.getUserId())
-                .creditAmount(opsUserCredit.getCredit())
-                .version(opsUserCredit.getVersion())
+    public static UserCreditEntity from(final UserCredit userCredit) {
+        return UserCreditEntity.builder()
+                .id(userCredit.getId())
+                .userId(userCredit.getUserId())
+                .creditAmount(userCredit.getCreditAmount())
+                .version(userCredit.getVersion())
                 .build();
     }
 
-    public OpsUserCredit toOpsUserCredit() {
-        return OpsUserCredit.builder()
+    public UserCredit toUserCredit() {
+        return UserCredit.builder()
                 .id(this.id)
                 .userId(this.userId)
-                .credit(this.creditAmount)
+                .credit(Credit.from(this.creditAmount))
                 .version(this.version)
                 .build();
     }

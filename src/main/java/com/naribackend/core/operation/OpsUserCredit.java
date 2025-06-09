@@ -1,6 +1,7 @@
 package com.naribackend.core.operation;
 
-import jakarta.persistence.Version;
+import com.naribackend.support.error.CoreException;
+import com.naribackend.support.error.ErrorType;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -11,8 +12,6 @@ public class OpsUserCredit {
     private final Long id;
     private final Long userId;
     private long credit;
-
-    @Version
     private Long version;
 
     public static OpsUserCredit newZeroCreditFor(final long userId) {
@@ -20,5 +19,14 @@ public class OpsUserCredit {
             .userId(userId)
             .credit(0L)
             .build();
+    }
+
+    public void chargeCredit(long amount) {
+
+        if (amount <= 0) {
+            throw new CoreException(ErrorType.INVALID_CREDIT_AMOUNT);
+        }
+
+        this.credit += amount;
     }
 }

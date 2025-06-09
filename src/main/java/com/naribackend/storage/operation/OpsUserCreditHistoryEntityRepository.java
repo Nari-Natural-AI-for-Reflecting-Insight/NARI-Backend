@@ -22,9 +22,9 @@ public class OpsUserCreditHistoryEntityRepository implements OpsUserCreditHistor
 
     @Override
     public List<OpsUserCreditHistory> findAllByUserId(long userId) {
-        return opsUserCreditHistoryJpaRepository.findAllByModifiedUserId(userId)
+        return opsUserCreditHistoryJpaRepository.findAllByCreatedUserId(userId)
                 .stream()
-                .map(OpsUserCreditHistoryEntity::toDomain)
+                .map(OpsUserCreditHistoryEntity::toOpsUserCreditHistory)
                 .toList();
     }
 }
