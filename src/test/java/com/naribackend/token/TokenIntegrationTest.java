@@ -195,8 +195,8 @@ public class TokenIntegrationTest {
         }
     }
 
-    @DisplayName("Realtime 임시 토큰 생성 API 성공 - 동시 요청 처리")
     @RepeatedTest(5)
+    @DisplayName("Realtime 임시 토큰 생성 API 성공 - 동시 요청 처리")
     void create_realtime_token_concurrent_requests_success() throws Exception {
 
         // given
