@@ -21,6 +21,11 @@ public class IdempotencyKey {
         return key.equals(that.key);
     }
 
+    @Override
+    public int hashCode() {
+        return key.hashCode();
+    }
+
     public static IdempotencyKey from(final String key) {
         return new IdempotencyKey(key);
     }
