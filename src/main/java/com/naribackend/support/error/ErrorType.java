@@ -32,7 +32,8 @@ public enum ErrorType {
     INVALID_CREDIT_AMOUNT(HttpStatus.BAD_REQUEST, ErrorCode.E400, "잘못된 크레딧 금액입니다.", LogLevel.DEBUG),
     NOT_SUFFICIENT_CREDIT(HttpStatus.UNPROCESSABLE_ENTITY, ErrorCode.E422, "충전 금액이 부족합니다.", LogLevel.DEBUG),
     INVALID_CREDIT_OPERATION(HttpStatus.BAD_REQUEST, ErrorCode.E400, "잘못된 크레딧 연산입니다.", LogLevel.DEBUG),
-
+    INVALID_CREDIT_OPERATION_REASON(HttpStatus.BAD_REQUEST, ErrorCode.E500, "잘못된 크레딧 연산 사유입니다.", LogLevel.DEBUG),
+    INVALID_IDEMPOTENCY_KEY(HttpStatus.BAD_REQUEST, ErrorCode.E400, "중복된 요청 입니다.", LogLevel.DEBUG),
     ;
 
     private final HttpStatus status;

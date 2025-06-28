@@ -1,7 +1,6 @@
 package com.naribackend.core.operation;
 
 import com.naribackend.core.common.CreditOperationReason;
-import com.naribackend.storage.operation.OpsUserCreditAppender;
 import com.naribackend.support.error.CoreException;
 import com.naribackend.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;

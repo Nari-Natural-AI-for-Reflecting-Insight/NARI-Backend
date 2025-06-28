@@ -9,7 +9,9 @@ public enum CreditOperationReason {
 
     OPS_CREDIT_FOR_TEST,
     OPS_CREDIT_FOR_EVENT,
-    REALTIME_ACCESS_TOKEN;
+    REALTIME_ACCESS_TOKEN,
+    DAILY_COUNSELING,
+    ;
 
     public static CreditOperationReason from(String reason) {
         if (reason == null || reason.isBlank()) {

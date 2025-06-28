@@ -1,7 +1,5 @@
-package com.naribackend.storage.operation;
+package com.naribackend.core.operation;
 
-import com.naribackend.core.operation.OpsUserCredit;
-import com.naribackend.core.operation.OpsUserCreditRepository;
 import jakarta.persistence.OptimisticLockException;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.StaleObjectStateException;

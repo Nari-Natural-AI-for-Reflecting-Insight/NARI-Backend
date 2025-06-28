@@ -318,8 +318,8 @@ public class OpsCreditIntegrationTest {
                 .isEmpty();
     }
 
-    @DisplayName("운영 크레딧 충전 API 성공 - 동시 요청 처리")
     @RepeatedTest(5)
+    @DisplayName("운영 크레딧 충전 API 성공 - 동시 요청 처리")
     void ops_charge_credit_success_concurrent_requests() throws Exception {
 
         // given
@@ -370,7 +370,8 @@ public class OpsCreditIntegrationTest {
                 try {
                     barrier.await();
                     task.run();
-                } catch (Exception ignored) {
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
                 }
             });
         }

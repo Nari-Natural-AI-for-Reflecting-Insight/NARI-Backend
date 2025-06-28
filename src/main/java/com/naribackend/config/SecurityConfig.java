@@ -30,7 +30,8 @@ public class SecurityConfig {
                             "/api/v1/user/me/password",
                             "/api/v1/user/me/nickname",
                             "/api/v1/token/realtime",
-                            "/api/v1/ops/credit/charge"
+                            "/api/v1/ops/credit/charge",
+                            "/api/v1/credit/subtract"
                     ).permitAll()
                     .requestMatchers(
                             "/v3/api-docs/**",
