@@ -23,12 +23,12 @@ public class UserCreditModifier {
             backoff = @org.springframework.retry.annotation.Backoff(delay = 500, multiplier = 1.5, maxDelay = 1000)
     )
     @Transactional
-    public Credit subtractCredit(final long targetUserId, final SubtractCreditOperation operation) {
+    public Credit payCredit(final long targetUserId, final PayCreditOperation operation) {
 
         UserCredit userCredit = userCreditRepository.getUserCredit(targetUserId)
                 .orElseThrow(() -> new CoreException(ErrorType.NOT_SUFFICIENT_CREDIT));
 
-        if (userCredit.hasLessThan(operation.getCreditToSubtract())) {
+        if (userCredit.hasLessThan(operation.getCreditToPay())) {
             throw new CoreException(ErrorType.NOT_SUFFICIENT_CREDIT);
         }
 

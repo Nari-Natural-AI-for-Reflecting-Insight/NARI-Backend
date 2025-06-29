@@ -2,7 +2,7 @@ package com.naribackend.core.token;
 
 import com.naribackend.core.auth.LoginUser;
 import com.naribackend.core.credit.Credit;
-import com.naribackend.core.credit.SubtractCreditOperation;
+import com.naribackend.core.credit.PayCreditOperation;
 import com.naribackend.core.credit.UserCreditHistoryAppender;
 import com.naribackend.core.credit.UserCreditModifier;
 import lombok.RequiredArgsConstructor;
@@ -22,16 +22,16 @@ public class TokenService {
 
     public RealtimeTokenInfo createTokenInfo(final LoginUser loginUser) {
 
-        var subtractOperation = SubtractCreditOperation.REALTIME_ACCESS_TOKEN;
-        Credit currentCredit = userCreditModifier.subtractCredit(
+        var payOperation = PayCreditOperation.REALTIME_ACCESS_TOKEN;
+        Credit currentCredit = userCreditModifier.payCredit(
                 loginUser.getId(),
-                subtractOperation
+                payOperation
         );
 
         userCreditHistoryAppender.append(
                 loginUser.getId(),
-                subtractOperation.toReason(),
-                -subtractOperation.getCreditAmountToSubtract(),
+                payOperation.toReason(),
+                -payOperation.getCreditAmountToPay(),
                 currentCredit
         );
 

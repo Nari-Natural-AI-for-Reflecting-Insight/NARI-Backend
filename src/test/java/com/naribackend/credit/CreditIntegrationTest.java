@@ -1,7 +1,7 @@
 package com.naribackend.credit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.naribackend.api.v1.credit.request.SubtractCreditRequest;
+import com.naribackend.api.v1.credit.request.PayCreditRequest;
 import com.naribackend.core.credit.UserCreditRepository;
 import com.naribackend.core.idempotency.IdempotencyKey;
 import com.naribackend.core.idempotency.IdempotencyRepository;
@@ -57,21 +57,21 @@ public class CreditIntegrationTest {
     private static final String DAILY_COUNSELING_OPERATION = "DAILY_COUNSELING"; // Example operation, can be parameterized
 
     @ParameterizedTest(name = "{index} - userCredit={0}")
-    @DisplayName("사용자 크레딧 차감 API 성공")
+    @DisplayName("사용자 크레딧 결제 API 성공")
     @ValueSource(longs = {
             DAILY_COUNSELING_CREDIT_PER_REQUEST,
             DAILY_COUNSELING_CREDIT_PER_REQUEST + 1L,
            1000000L
     })
-    void subtract_credit_request_success(final long userCreditAmount) throws Exception {
+    void pay_credit_request_success(final long userCreditAmount) throws Exception {
         // given
         TestUser testUser = testUserFactory.createTestUserWithCredit(userCreditAmount);
         String accessToken = testUser.accessToken();
         long expectedCreditAfterOperation = userCreditAmount - DAILY_COUNSELING_CREDIT_PER_REQUEST;
-        SubtractCreditRequest request = new SubtractCreditRequest(DAILY_COUNSELING_OPERATION, IDEMPOTENCY_KEY);
+        PayCreditRequest request = new PayCreditRequest(DAILY_COUNSELING_OPERATION, IDEMPOTENCY_KEY);
 
         // when & then
-        mockMvc.perform(RestDocumentationRequestBuilders.post("/api/v1/credit/subtract")
+        mockMvc.perform(RestDocumentationRequestBuilders.post("/api/v1/credit/pay")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
                         .header("Authorization", "Bearer " + accessToken))
@@ -89,13 +89,13 @@ public class CreditIntegrationTest {
     }
 
     @ParameterizedTest(name = "{index} - userCredit={0}")
-    @DisplayName("사용자 크레딧 차감 테스트 실패 - 중복된 멱등성 키 사용")
+    @DisplayName("사용자 크레딧 결제 테스트 실패 - 중복된 멱등성 키 사용")
     @ValueSource(longs = {
             DAILY_COUNSELING_CREDIT_PER_REQUEST,
             DAILY_COUNSELING_CREDIT_PER_REQUEST + 1L,
             1000000L
     })
-    void subtract_credit_fail_duplicated_idempotency_key(final long userCreditAmount) throws Exception {
+    void pay_credit_fail_duplicated_idempotency_key(final long userCreditAmount) throws Exception {
         // given
 
         // 테스트 멱등성 키를 저장
@@ -104,10 +104,10 @@ public class CreditIntegrationTest {
         TestUser testUser = testUserFactory.createTestUserWithCredit(userCreditAmount);
         String accessToken = testUser.accessToken();
         long expectedCreditAmount = userCreditAmount;
-        SubtractCreditRequest request = new SubtractCreditRequest(DAILY_COUNSELING_OPERATION, IDEMPOTENCY_KEY);
+        PayCreditRequest request = new PayCreditRequest(DAILY_COUNSELING_OPERATION, IDEMPOTENCY_KEY);
 
         // when & then
-        mockMvc.perform(RestDocumentationRequestBuilders.post("/api/v1/credit/subtract")
+        mockMvc.perform(RestDocumentationRequestBuilders.post("/api/v1/credit/pay")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
                         .header("Authorization", "Bearer " + accessToken))
@@ -125,21 +125,21 @@ public class CreditIntegrationTest {
     }
 
     @ParameterizedTest(name = "{index} - userCredit={0}")
-    @DisplayName("사용자 크레딧 차감 테스트 실패 - 크레딧 부족")
+    @DisplayName("사용자 크레딧 결제 테스트 실패 - 크레딧 부족")
     @ValueSource(longs = {
             DAILY_COUNSELING_CREDIT_PER_REQUEST - 1,
             0,
             100L
     })
-    void subtract_credit_fail_insufficient_credit(final long userCreditAmount) throws Exception {
+    void pay_credit_fail_insufficient_credit(final long userCreditAmount) throws Exception {
         // given
         TestUser testUser = testUserFactory.createTestUserWithCredit(userCreditAmount);
         String accessToken = testUser.accessToken();
         long expectedCreditAmount = userCreditAmount;
-        SubtractCreditRequest request = new SubtractCreditRequest(DAILY_COUNSELING_OPERATION, IDEMPOTENCY_KEY);
+        PayCreditRequest request = new PayCreditRequest(DAILY_COUNSELING_OPERATION, IDEMPOTENCY_KEY);
 
         // when & then
-        mockMvc.perform(RestDocumentationRequestBuilders.post("/api/v1/credit/subtract")
+        mockMvc.perform(RestDocumentationRequestBuilders.post("/api/v1/credit/pay")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
                         .header("Authorization", "Bearer " + accessToken))
@@ -157,8 +157,8 @@ public class CreditIntegrationTest {
     }
 
     @RepeatedTest(5)
-    @DisplayName("사용자 크레딧 차감 테스트 성공 - 동시 요청 처리")
-    void subtract_credit_concurrent_requests() throws Exception {
+    @DisplayName("사용자 크레딧 결제 테스트 성공 - 동시 요청 처리")
+    void pay_credit_concurrent_requests() throws Exception {
         // given
         long userCreditAmount = 10000L;
         TestUser testUser = testUserFactory.createTestUserWithCredit(userCreditAmount);
@@ -168,7 +168,7 @@ public class CreditIntegrationTest {
         long expectedCreditAfterOperation = userCreditAmount - (DAILY_COUNSELING_CREDIT_PER_REQUEST * threadCount);
 
         // when & then
-        executeConcurrentRequests(threadCount, () -> subtractCreditRequest(
+        executeConcurrentRequests(threadCount, () -> payCreditRequest(
                 accessToken,
                 DAILY_COUNSELING_OPERATION
         ));
@@ -201,19 +201,19 @@ public class CreditIntegrationTest {
         pool.awaitTermination(5, TimeUnit.SECONDS);
     }
 
-    private void subtractCreditRequest(
+    private void payCreditRequest(
             final String accessToken,
             final String operation
     ) throws RuntimeException {
 
         String idempotencyKey = UUID.randomUUID().toString();
 
-        SubtractCreditRequest request = new SubtractCreditRequest(
+        PayCreditRequest request = new PayCreditRequest(
                 operation, idempotencyKey
         );
 
         try {
-            mockMvc.perform(RestDocumentationRequestBuilders.post("/api/v1/credit/subtract")
+            mockMvc.perform(RestDocumentationRequestBuilders.post("/api/v1/credit/pay")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request))
                             .header("Authorization", "Bearer " + accessToken))

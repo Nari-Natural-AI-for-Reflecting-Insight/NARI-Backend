@@ -12,7 +12,7 @@ public class UserCredit {
     private Credit credit;
     private final Long version;
 
-    public void execute(final SubtractCreditOperation operation) {
+    public void execute(final PayCreditOperation operation) {
         this.credit = operation.execute(this.credit);
     }
 
