@@ -6,6 +6,7 @@ import jakarta.persistence.OptimisticLockException;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.StaleObjectStateException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +21,7 @@ public class UserCreditModifier {
             retryFor = {OptimisticLockException.class, DataIntegrityViolationException.class,
                         StaleObjectStateException.class},
             maxAttempts = 3,
-            backoff = @org.springframework.retry.annotation.Backoff(delay = 500, multiplier = 1.5, maxDelay = 1000)
+            backoff = @Backoff(delay = 500, multiplier = 1.5, maxDelay = 1000)
     )
     @Transactional
     public Credit payCredit(final long targetUserId, final PayCreditOperation operation) {

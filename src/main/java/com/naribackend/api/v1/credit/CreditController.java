@@ -20,7 +20,7 @@ public class CreditController {
     private final UserCreditService userCreditService;
 
     @PostMapping("/pay")
-    public ApiResponse<?> createToken(
+    public ApiResponse<?> payCredit(
             @Parameter(hidden = true)
             @CurrentUser final LoginUser loginUser,
             @RequestBody final PayCreditRequest request

@@ -34,6 +34,12 @@ public enum ErrorType {
     INVALID_CREDIT_OPERATION(HttpStatus.BAD_REQUEST, ErrorCode.E400, "잘못된 크레딧 연산입니다.", LogLevel.DEBUG),
     INVALID_CREDIT_OPERATION_REASON(HttpStatus.BAD_REQUEST, ErrorCode.E500, "잘못된 크레딧 연산 사유입니다.", LogLevel.DEBUG),
     INVALID_IDEMPOTENCY_KEY(HttpStatus.BAD_REQUEST, ErrorCode.E400, "중복된 요청 입니다.", LogLevel.DEBUG),
+
+    // 악의 있는 요청에 대한 에러
+    INVALID_USER_REQUEST_USER_CREDIT_HISTORY(HttpStatus.FORBIDDEN, ErrorCode.E400, "연결에 실패하였습니다.", LogLevel.INFO),
+    NOT_FOUND_USER_CREDIT_HISTORY(HttpStatus.BAD_REQUEST, ErrorCode.E400, "연결에 실패하였습니다.", LogLevel.INFO),
+    TALK_SESSION_RETRY_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, ErrorCode.E400, "연결에 실패하였습니다.", LogLevel.INFO),
+    TALK_SESSION_NOT_STARTED(HttpStatus.BAD_REQUEST, ErrorCode.E400, "연결에 실패하였습니다.", LogLevel.INFO)
     ;
 
     private final HttpStatus status;
