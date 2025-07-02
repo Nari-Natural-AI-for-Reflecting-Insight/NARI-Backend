@@ -1,5 +1,6 @@
 package com.naribackend.support;
 
+import com.naribackend.core.auth.LoginUser;
 import com.naribackend.core.email.UserEmail;
 import lombok.Builder;
 
@@ -10,4 +11,10 @@ public record TestUser(
         String rawPassword,
         String accessToken
 ) {
+
+    public LoginUser toLoginUser() {
+        return LoginUser.builder()
+                .id(id)
+                .build();
+    }
 }
