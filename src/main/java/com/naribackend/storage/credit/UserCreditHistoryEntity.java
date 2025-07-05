@@ -53,6 +53,7 @@ public class UserCreditHistoryEntity extends BaseEntity {
                 .reason(this.reason)
                 .changedCreditAmount(this.changedCreditAmount)
                 .currentCredit(Credit.from(this.currentCreditAmount))
+                .createdAt(this.getCreatedAt())
                 .build();
     }
 }

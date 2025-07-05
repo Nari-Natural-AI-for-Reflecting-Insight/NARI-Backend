@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "talk.policy")
 public class TalkPolicyProperties {
 
-    private int maxTalkTryCount;
+    private int maxSessionCountPerPay;
 
-    private int maxTryDurationHours;
+    private int maxSessionDurationInMinutes;
 }

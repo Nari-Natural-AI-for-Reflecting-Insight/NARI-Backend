@@ -1,16 +1,17 @@
 package com.naribackend.api.v1.talk;
 
+import com.naribackend.api.v1.talk.request.CreateTalkSessionRequest;
+import com.naribackend.api.v1.talk.response.CreateTalkSessionResponse;
 import com.naribackend.core.auth.CurrentUser;
 import com.naribackend.core.auth.LoginUser;
+import com.naribackend.core.talk.TalkSession;
 import com.naribackend.core.talk.TalkSessionHistoryService;
 import com.naribackend.support.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,16 +21,22 @@ public class TalkController {
     private final TalkSessionHistoryService talkSessionHistoryService;
 
     @Operation(
-            summary = "Talk 세션 접근 시도 기록 수정",
-            description = "Talk 세션 접근 시도 기록을 수정합니다."
+            summary = "Talk Session 생성",
+            description = "실시간 대화와 관련된 정보를 기록하는 Talk Session을 생성합니다. 이 API는 외부 대화 Session 이 시작될 때 호출되어야 합니다."
     )
-    @PatchMapping("/session/{userCreditHistoryId}/retry")
-    public ApiResponse<?> modifyRetryHistory(
+    @PostMapping("/session")
+    public ApiResponse<?> createTalkSession(
             @Parameter(hidden = true) @CurrentUser final LoginUser loginUser,
-            @Parameter(description = "결제 내역 Id") @PathVariable final Long userCreditHistoryId
+            @Valid @RequestBody final CreateTalkSessionRequest request
     ) {
-        talkSessionHistoryService.modifyRetryHistory(loginUser, userCreditHistoryId);
+        TalkSession talkSession = talkSessionHistoryService.createTalkSession(
+                request.paidUserCreditHistoryId(),
+                loginUser,
+                request.toIdempotencyKey()
+        );
 
-        return ApiResponse.success();
+        return ApiResponse.success(
+                CreateTalkSessionResponse.from(talkSession)
+        );
     }
 }
