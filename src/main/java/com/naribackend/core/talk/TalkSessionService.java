@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-public class TalkSessionHistoryService {
+public class TalkSessionService {
 
     private final UserCreditHistoryRepository userCreditHistoryRepository;
 

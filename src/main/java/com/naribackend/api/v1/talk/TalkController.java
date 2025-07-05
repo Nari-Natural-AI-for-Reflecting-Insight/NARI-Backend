@@ -5,7 +5,7 @@ import com.naribackend.api.v1.talk.response.CreateTalkSessionResponse;
 import com.naribackend.core.auth.CurrentUser;
 import com.naribackend.core.auth.LoginUser;
 import com.naribackend.core.talk.TalkSession;
-import com.naribackend.core.talk.TalkSessionHistoryService;
+import com.naribackend.core.talk.TalkSessionService;
 import com.naribackend.support.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/talk")
 public class TalkController {
 
-    private final TalkSessionHistoryService talkSessionHistoryService;
+    private final TalkSessionService talkSessionService;
 
     @Operation(
             summary = "Talk Session 생성",
@@ -29,7 +29,7 @@ public class TalkController {
             @Parameter(hidden = true) @CurrentUser final LoginUser loginUser,
             @Valid @RequestBody final CreateTalkSessionRequest request
     ) {
-        TalkSession talkSession = talkSessionHistoryService.createTalkSession(
+        TalkSession talkSession = talkSessionService.createTalkSession(
                 request.paidUserCreditHistoryId(),
                 loginUser,
                 request.toIdempotencyKey()
