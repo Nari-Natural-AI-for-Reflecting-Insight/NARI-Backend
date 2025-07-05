@@ -17,7 +17,7 @@ public class CreditFactory {
     private final UserCreditHistoryRepository userCreditHistoryRepository;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public UserCreditHistory createHistory(TestUser testUser) {
+    public UserCreditHistory payDailyCounseling(TestUser testUser) {
         UserCreditHistory userCreditHistoryEntity = UserCreditHistory.builder()
                 .createdUserId(testUser.id())
                 .reason(CreditOperationReason.DAILY_COUNSELING)
