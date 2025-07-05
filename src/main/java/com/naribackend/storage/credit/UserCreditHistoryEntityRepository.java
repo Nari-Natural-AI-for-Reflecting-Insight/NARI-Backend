@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -14,9 +15,10 @@ public class UserCreditHistoryEntityRepository implements UserCreditHistoryRepos
     private final UserCreditHistoryJpaRepository userCreditHistoryJpaRepository;
 
     @Override
-    public void save(UserCreditHistory userCreditHistory) {
+    public UserCreditHistory save(UserCreditHistory userCreditHistory) {
         UserCreditHistoryEntity userCreditHistoryEntity = UserCreditHistoryEntity.from(userCreditHistory);
-        userCreditHistoryJpaRepository.save(userCreditHistoryEntity);
+
+        return userCreditHistoryJpaRepository.save(userCreditHistoryEntity).toUserCreditHistory();
     }
 
     @Override
@@ -26,5 +28,11 @@ public class UserCreditHistoryEntityRepository implements UserCreditHistoryRepos
                 .stream()
                 .map(UserCreditHistoryEntity::toUserCreditHistory)
                 .toList();
+    }
+
+    @Override
+    public Optional<UserCreditHistory> findById(Long id) {
+        return userCreditHistoryJpaRepository.findById(id)
+                .map(UserCreditHistoryEntity::toUserCreditHistory);
     }
 }

@@ -16,22 +16,22 @@ public class UserCreditService {
 
     private final IdempotencyAppender idempotencyAppender;
 
-    public void subtractCredit(
+    public void payCredit(
             final LoginUser loginUser,
-            final SubtractCreditOperation subtractOperation,
+            final PayCreditOperation payOperation,
             final IdempotencyKey idempotencyKey
     ) {
         idempotencyAppender.appendOrThrowIfExists(idempotencyKey);
 
-        Credit currentCredit = userCreditModifier.subtractCredit(
+        Credit currentCredit = userCreditModifier.payCredit(
                 loginUser.getId(),
-                subtractOperation
+                payOperation
         );
 
         userCreditHistoryAppender.append(
                 loginUser.getId(),
-                subtractOperation.toReason(),
-                -subtractOperation.getCreditAmountToSubtract(),
+                payOperation.toReason(),
+                -payOperation.getCreditAmountToPay(),
                 currentCredit
         );
     }

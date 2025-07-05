@@ -119,7 +119,7 @@ public class TokenIntegrationTest {
         // given
         TestUser testUser = testUserFactory.createTestUserWithCredit(userCreditAmount);
         String accessToken = testUser.accessToken();
-        long expectedUserCreditAmount = userCreditAmount; // 크레딧이 차감되지 않아야 함
+        long expectedUserCreditAmount = userCreditAmount; // 크레딧이 결제되지 않아야 함
 
         // when & then
         mockMvc.perform(
@@ -130,7 +130,7 @@ public class TokenIntegrationTest {
                 .andExpect(status().isUnprocessableEntity());
 
         // then
-        // 크레딧이 차감되지 않았는지 검증
+        // 크레딧이 결제되지 않았는지 검증
         long actualUserCreditAmount = userCreditRepository.getUserCredit(testUser.id())
                 .orElseThrow()
                 .getCredit()

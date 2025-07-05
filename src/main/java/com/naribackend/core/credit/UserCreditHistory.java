@@ -30,4 +30,12 @@ public class UserCreditHistory {
                 .currentCredit(currentCredit)
                 .build();
     }
+
+    public boolean isUserCreated(Long userId) {
+        return createdUserId.equals(userId);
+    }
+
+    public boolean isCreatedAtBefore(LocalDateTime targetTime) {
+        return createdAt.isBefore(targetTime);
+    }
 }

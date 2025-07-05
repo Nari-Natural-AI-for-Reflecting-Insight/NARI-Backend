@@ -34,7 +34,49 @@ public enum ErrorType {
     INVALID_CREDIT_OPERATION(HttpStatus.BAD_REQUEST, ErrorCode.E400, "잘못된 크레딧 연산입니다.", LogLevel.DEBUG),
     INVALID_CREDIT_OPERATION_REASON(HttpStatus.BAD_REQUEST, ErrorCode.E500, "잘못된 크레딧 연산 사유입니다.", LogLevel.DEBUG),
     INVALID_IDEMPOTENCY_KEY(HttpStatus.BAD_REQUEST, ErrorCode.E400, "중복된 요청 입니다.", LogLevel.DEBUG),
-    ;
+
+    INVALID_USER_REQUEST_USER_CREDIT_HISTORY (
+            HttpStatus.FORBIDDEN,
+            ErrorCode.E403,
+            "해당 크레딧 이력에 접근할 수 없습니다.",
+            LogLevel.INFO
+    ),
+    NOT_FOUND_USER_CREDIT_HISTORY (
+            HttpStatus.NOT_FOUND,
+            ErrorCode.E404,
+            "결제(크레딧) 이력을 찾을 수 없습니다.",
+            LogLevel.INFO
+    ),
+    TALK_SESSION_RETRY_LIMIT_EXCEEDED (
+            HttpStatus.TOO_MANY_REQUESTS,
+            ErrorCode.E429,
+            "허용된 재시도 횟수를 초과했습니다.",
+            LogLevel.INFO
+    ),
+    TALK_SESSION_EXCEEDS_MAX_DURATION (
+            HttpStatus.CONFLICT,
+            ErrorCode.E409,
+            "대화 세션이 최대 지속 시간을 초과했습니다.",
+            LogLevel.INFO
+    ),
+    EXPIRED_USER_CREDIT_HISTORY (
+            HttpStatus.CONFLICT,
+            ErrorCode.E409,
+            "해당 크레딧 이력은 만료되었습니다.",
+            LogLevel.INFO
+    ),
+    TALK_SESSION_NOT_STARTED (
+            HttpStatus.CONFLICT,
+            ErrorCode.E409,
+            "대화 세션이 아직 시작되지 않았습니다.",
+            LogLevel.INFO
+    ),
+    COMPLETED_TALK_SESSION_EXISTS(
+            HttpStatus.CONFLICT,
+            ErrorCode.E409,
+            "해당 크레딧 이력으로 이미 완료된 대화 세션이 존재합니다.",
+            LogLevel.INFO
+    );
 
     private final HttpStatus status;
 
@@ -43,5 +85,14 @@ public enum ErrorType {
     private final String message;
 
     private final LogLevel logLevel;
+
+
+    public int getHttpStatusValue() {
+        return status.value();
+    }
+
+    public String getCodeStr() {
+        return code.toString();
+    }
 
 }

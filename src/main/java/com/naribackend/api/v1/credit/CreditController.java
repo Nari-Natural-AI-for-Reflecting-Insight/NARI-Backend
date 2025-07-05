@@ -1,6 +1,6 @@
 package com.naribackend.api.v1.credit;
 
-import com.naribackend.api.v1.credit.request.SubtractCreditRequest;
+import com.naribackend.api.v1.credit.request.PayCreditRequest;
 import com.naribackend.core.auth.CurrentUser;
 import com.naribackend.core.auth.LoginUser;
 import com.naribackend.core.credit.UserCreditService;
@@ -19,13 +19,13 @@ public class CreditController {
 
     private final UserCreditService userCreditService;
 
-    @PostMapping("/subtract")
-    public ApiResponse<?> createToken(
+    @PostMapping("/pay")
+    public ApiResponse<?> payCredit(
             @Parameter(hidden = true)
             @CurrentUser final LoginUser loginUser,
-            @RequestBody final SubtractCreditRequest request
+            @RequestBody final PayCreditRequest request
     ) {
-        userCreditService.subtractCredit(loginUser, request.toSubtractCreditOperation(), request.toIdempotencyKey());
+        userCreditService.payCredit(loginUser, request.toPayCreditOperation(), request.toIdempotencyKey());
 
         return ApiResponse.success();
     }

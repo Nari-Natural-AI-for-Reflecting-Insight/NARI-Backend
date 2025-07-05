@@ -26,7 +26,7 @@ public record Credit(
         return Credit.from(this.creditAmount + other.creditAmount());
     }
 
-    public Credit subtract(Credit other) {
+    public Credit pay(Credit other) {
         requireNotNull(other);
         return Credit.from(this.creditAmount - other.creditAmount());
     }
