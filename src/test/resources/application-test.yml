@@ -24,5 +24,5 @@ openai:
 
 talk:
   policy:
-    max-talk-try-count: 3
-    max-try-duration-hours: 2
+    max-session-count-per-pay: 3
+    max-session-duration-in-minutes: 120
