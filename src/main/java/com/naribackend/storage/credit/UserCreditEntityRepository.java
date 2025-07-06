@@ -4,6 +4,7 @@ import com.naribackend.core.credit.UserCredit;
 import com.naribackend.core.credit.UserCreditRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -20,6 +21,7 @@ public class UserCreditEntityRepository implements UserCreditRepository {
     }
 
     @Override
+    @Transactional
     public void save(UserCredit userCredit) {
         UserCreditEntity userCreditEntity = UserCreditEntity.from(userCredit);
         userCreditJpaRepository.save(userCreditEntity);
