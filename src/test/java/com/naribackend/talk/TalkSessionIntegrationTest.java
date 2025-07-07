@@ -4,11 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import com.naribackend.api.v1.talk.request.CreateTalkSessionRequest;
 import com.naribackend.core.DateTimeProvider;
-import com.naribackend.core.credit.UserCreditHistory;
+import com.naribackend.core.talk.Talk;
 import com.naribackend.core.talk.TalkPolicyProperties;
 import com.naribackend.core.talk.TalkSession;
 import com.naribackend.core.talk.TalkSessionRepository;
-import com.naribackend.credit.CreditFactory;
 import com.naribackend.storage.talk.TalkSessionJpaRepository;
 import com.naribackend.support.TestUser;
 import com.naribackend.support.TestUserFactory;
@@ -45,9 +44,6 @@ public class TalkSessionIntegrationTest {
     private TestUserFactory testUserFactory;
 
     @Autowired
-    private CreditFactory creditFactory;
-
-    @Autowired
     private TalkSessionJpaRepository talkSessionJpaRepository;
 
     @Autowired
@@ -58,6 +54,9 @@ public class TalkSessionIntegrationTest {
 
     @Autowired
     private TalkPolicyProperties talkPolicyProperties;
+
+    @Autowired
+    private TalkFactory talkFactory;
 
     @MockitoSpyBean
     private DateTimeProvider dateTimeProvider;
@@ -72,9 +71,10 @@ public class TalkSessionIntegrationTest {
 
         // given
         TestUser testUser = testUserFactory.createTestUser();
-        UserCreditHistory paidCreditHistory = creditFactory.payDailyCounseling(testUser);
+        Talk parentTalk = talkFactory.createTalk(testUser.id());
+
         var request = CreateTalkSessionRequest.builder()
-                .paidUserCreditHistoryId(paidCreditHistory.getId())
+                .parentTalkId(parentTalk.getId())
                 .idempotencyKey(IDEMPOTENCY_KEY)
                 .build();
 
@@ -86,7 +86,7 @@ public class TalkSessionIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpectAll(
                         jsonPath("$.data.talkSessionId").exists(),
-                        jsonPath("$.data.paidUserCreditHistoryId").value(paidCreditHistory.getId()),
+                        jsonPath("$.data.parentTalkId").value(parentTalk.getId()),
                         jsonPath("$.data.createdUserId").value(testUser.id()),
                         jsonPath("$.data.createdAt").exists(),
                         jsonPath("$.data.status").value("CREATED")
@@ -104,12 +104,12 @@ public class TalkSessionIntegrationTest {
 
         // given
         TestUser testUser = testUserFactory.createTestUser();
-        UserCreditHistory paidCreditHistory = creditFactory.payDailyCounseling(testUser);
+        Talk parentTalk = talkFactory.createTalk(testUser.id());
 
         // when & then 최대 세션 수 만큼 세션 생성
         for (int i = 0; i < talkPolicyProperties.getMaxSessionCountPerPay(); i++) {
             var request = CreateTalkSessionRequest.builder()
-                    .paidUserCreditHistoryId(paidCreditHistory.getId())
+                    .parentTalkId(parentTalk.getId())
                     .idempotencyKey(IDEMPOTENCY_KEY + i)
                     .build();
 
@@ -129,11 +129,11 @@ public class TalkSessionIntegrationTest {
         TestUser testUser = testUserFactory.createTestUser();
         Long invalidCreditHistoryId = 999L;
         var request = CreateTalkSessionRequest.builder()
-                .paidUserCreditHistoryId(invalidCreditHistoryId)
+                .parentTalkId(invalidCreditHistoryId)
                 .idempotencyKey(IDEMPOTENCY_KEY)
                 .build();
 
-        ErrorType expectedErrorType = ErrorType.NOT_FOUND_USER_CREDIT_HISTORY;
+        ErrorType expectedErrorType = ErrorType.NOT_FOUND_TALK;
 
         // when & then
         mockMvc.perform(post(TALK_SESSION_PATH)
@@ -152,9 +152,11 @@ public class TalkSessionIntegrationTest {
     void createTalkSessionFailureNotAuthenticated() throws Exception {
 
         // given
-        UserCreditHistory paidCreditHistory = creditFactory.payDailyCounseling(testUserFactory.createTestUser());
+        TestUser testUser = testUserFactory.createTestUser();
+        Talk parentTalk = talkFactory.createTalk(testUser.id());
+
         var request = CreateTalkSessionRequest.builder()
-                .paidUserCreditHistoryId(paidCreditHistory.getId())
+                .parentTalkId(parentTalk.getId())
                 .idempotencyKey(IDEMPOTENCY_KEY)
                 .build();
 
@@ -178,13 +180,14 @@ public class TalkSessionIntegrationTest {
         // given
         TestUser testUser = testUserFactory.createTestUser();
         TestUser otherTestUser = testUserFactory.createTestUser();
-        UserCreditHistory paidCreditHistory = creditFactory.payDailyCounseling(otherTestUser);
+        Talk parentTalk = talkFactory.createTalk(otherTestUser.id());
+
         var request = CreateTalkSessionRequest.builder()
-                .paidUserCreditHistoryId(paidCreditHistory.getId())
+                .parentTalkId(parentTalk.getId())
                 .idempotencyKey(IDEMPOTENCY_KEY)
                 .build();
 
-        ErrorType expectedErrorType = ErrorType.INVALID_USER_REQUEST_USER_CREDIT_HISTORY;
+        ErrorType expectedErrorType = ErrorType.INVALID_USER_REQUEST_TALK_SESSION;
 
         // when & then
         mockMvc.perform(post(TALK_SESSION_PATH)
@@ -204,17 +207,17 @@ public class TalkSessionIntegrationTest {
 
         // given
         TestUser testUser = testUserFactory.createTestUser();
-        UserCreditHistory paidCreditHistory = creditFactory.payDailyCounseling(testUser);
+        Talk parentTalk = talkFactory.createTalk(testUser.id());
 
         // 최대 세션 수를 초과하는 세션 생성
         for (int i = 0; i < talkPolicyProperties.getMaxSessionCountPerPay(); i++) {
             talkSessionRepository.save(
-                    TalkSession.from(paidCreditHistory)
+                    TalkSession.from(parentTalk)
             );
         }
 
         var request = CreateTalkSessionRequest.builder()
-                .paidUserCreditHistoryId(paidCreditHistory.getId())
+                .parentTalkId(parentTalk.getId())
                 .idempotencyKey(IDEMPOTENCY_KEY)
                 .build();
 
@@ -238,9 +241,9 @@ public class TalkSessionIntegrationTest {
 
         // given
         TestUser testUser = testUserFactory.createTestUser();
-        UserCreditHistory paidCreditHistory = creditFactory.payDailyCounseling(testUser);
+        Talk parentTalk = talkFactory.createTalk(testUser.id());
         var request = CreateTalkSessionRequest.builder()
-                .paidUserCreditHistoryId(paidCreditHistory.getId())
+                .parentTalkId(parentTalk.getId())
                 .idempotencyKey(IDEMPOTENCY_KEY)
                 .build();
 
@@ -272,16 +275,16 @@ public class TalkSessionIntegrationTest {
 
         // given
         TestUser testUser = testUserFactory.createTestUser();
-        UserCreditHistory paidCreditHistory = creditFactory.payDailyCounseling(testUser);
+        Talk parentTalk = talkFactory.createTalk(testUser.id());
 
         // 이미 완료된 세션을 생성
-        TalkSession talkSession = TalkSession.from(paidCreditHistory);
+        TalkSession talkSession = TalkSession.from(parentTalk);
         talkSession.complete(LocalDateTime.now());
 
         talkSessionRepository.save(talkSession);
 
         var request = CreateTalkSessionRequest.builder()
-                .paidUserCreditHistoryId(paidCreditHistory.getId())
+                .parentTalkId(parentTalk.getId())
                 .idempotencyKey(IDEMPOTENCY_KEY)
                 .build();
 
@@ -305,9 +308,9 @@ public class TalkSessionIntegrationTest {
 
         // given
         TestUser testUser = testUserFactory.createTestUser();
-        UserCreditHistory paidCreditHistory = creditFactory.payDailyCounseling(testUser);
+        Talk parentTalk = talkFactory.createTalk(testUser.id());
 
-        LocalDateTime expiredDateTime = paidCreditHistory.getCreatedAt().plusMinutes(
+        LocalDateTime expiredDateTime = parentTalk.getCreatedAt().plusMinutes(
                 talkPolicyProperties.getMaxSessionDurationInMinutes() + 1
         );
 
@@ -315,11 +318,11 @@ public class TalkSessionIntegrationTest {
                 thenReturn(expiredDateTime);
 
         var request = CreateTalkSessionRequest.builder()
-                .paidUserCreditHistoryId(paidCreditHistory.getId())
+                .parentTalkId(parentTalk.getId())
                 .idempotencyKey(IDEMPOTENCY_KEY)
                 .build();
 
-        ErrorType expectedErrorType = ErrorType.EXPIRED_USER_CREDIT_HISTORY;
+        ErrorType expectedErrorType = ErrorType.EXPIRED_TALK;
 
         // when & then
         mockMvc.perform(post(TALK_SESSION_PATH)
