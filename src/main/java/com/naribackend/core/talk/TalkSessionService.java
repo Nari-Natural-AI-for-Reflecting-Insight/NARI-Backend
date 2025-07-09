@@ -2,22 +2,19 @@ package com.naribackend.core.talk;
 
 import com.naribackend.core.DateTimeProvider;
 import com.naribackend.core.auth.LoginUser;
-import com.naribackend.core.credit.UserCreditHistory;
-import com.naribackend.core.credit.UserCreditHistoryRepository;
 import com.naribackend.core.idempotency.IdempotencyAppender;
 import com.naribackend.core.idempotency.IdempotencyKey;
 import com.naribackend.support.error.CoreException;
 import com.naribackend.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
 public class TalkSessionService {
-
-    private final UserCreditHistoryRepository userCreditHistoryRepository;
 
     private final TalkPolicyProperties talkPolicyProperties;
 
@@ -27,43 +24,54 @@ public class TalkSessionService {
 
     private final DateTimeProvider dateTimeProvider;
 
+    private final TalkRepository talkRepository;
+
+    @Transactional
     public TalkSession createTalkSession(
-            Long paidUserCreditHistoryId,
-            LoginUser loginUser,
-            IdempotencyKey idempotencyKey
+            final Long parentTalkId,
+            final LoginUser loginUser,
+            final IdempotencyKey idempotencyKey
     ) {
         idempotencyAppender.appendOrThrowIfExists(idempotencyKey);
 
-        UserCreditHistory paidUserCreditHistory = userCreditHistoryRepository.findById(paidUserCreditHistoryId)
-                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_USER_CREDIT_HISTORY));
+        Talk parentTalk = talkRepository.findById(parentTalkId)
+                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_TALK));
 
-        if (!paidUserCreditHistory.isUserCreated(loginUser.getId())) {
-            throw new CoreException(ErrorType.INVALID_USER_REQUEST_USER_CREDIT_HISTORY);
+        if (!parentTalk.isUserCreated(loginUser)) {
+            throw new CoreException(ErrorType.INVALID_USER_REQUEST_TALK_SESSION);
         }
 
         // 결제된 크레딧 이력의 최소 유효 날짜 시간 확인
         LocalDateTime minimumValidDateTime = dateTimeProvider.getCurrentDateTime()
                 .minusMinutes(talkPolicyProperties.getMaxSessionDurationInMinutes());
-        if(paidUserCreditHistory.isCreatedAtBefore(minimumValidDateTime)) {
-            throw new CoreException(ErrorType.EXPIRED_USER_CREDIT_HISTORY);
+
+        if(parentTalk.isCreatedAtBefore(minimumValidDateTime)) {
+            throw new CoreException(ErrorType.EXPIRED_TALK);
         }
 
         // 한번 결제된 크레딧 이력에 대한 생성한 세션 수가 최대 세션 수를 초과 하는지 확인
-        int sessionCountByPaidHistory = talkSessionRepository.countBy(paidUserCreditHistory);
-        if (sessionCountByPaidHistory >= talkPolicyProperties.getMaxSessionCountPerPay()) {
+        int childTalkSession = talkSessionRepository.countBy(parentTalk);
+        if (childTalkSession >= talkPolicyProperties.getMaxSessionCountPerPay()) {
             throw new CoreException(ErrorType.TALK_SESSION_RETRY_LIMIT_EXCEEDED);
         }
 
         // 지불한 사용자 크레딧 이력에 대해 이미 완료된 세션이 있는지 확인
-        boolean existsCompletedSession = talkSessionRepository.existsCompletedSessionBy(paidUserCreditHistory);
+        boolean existsCompletedSession = talkSessionRepository.existsCompletedSessionBy(parentTalk);
         if (existsCompletedSession) {
             throw new CoreException(ErrorType.COMPLETED_TALK_SESSION_EXISTS);
         }
 
+        // Talk 완료 처리, 최대 세션 수에 도달한 경우
+        if (childTalkSession >= talkPolicyProperties.getMaxSessionCountPerPay() - 1) {
+            parentTalk.complete(dateTimeProvider.getCurrentDateTime());
+            talkRepository.save(parentTalk);
+        }
+
         TalkSession savedTalkSession = talkSessionRepository.save(
-                TalkSession.from(paidUserCreditHistory)
+                TalkSession.from(parentTalk)
         );
 
         return savedTalkSession;
     }
+
 }

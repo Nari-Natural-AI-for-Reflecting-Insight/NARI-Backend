@@ -22,8 +22,8 @@ public class TalkSessionEntity extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "paid_user_credit_history_id", nullable = false)
-    private Long paidUserCreditHistoryId;
+    @Column(name = "parent_talk_id", nullable = false)
+    private Long parentTalkId;
 
     @Column(name = "created_user_id", nullable = false)
     private Long createdUserId;
@@ -38,7 +38,7 @@ public class TalkSessionEntity extends BaseEntity {
     public static TalkSessionEntity from(final TalkSession talkSession) {
         return TalkSessionEntity.builder()
                 .id(talkSession.getId())
-                .paidUserCreditHistoryId(talkSession.getPaidUserCreditHistoryId())
+                .parentTalkId(talkSession.getParentTalkId())
                 .createdUserId(talkSession.getCreatedUserId())
                 .status(talkSession.getStatus())
                 .completedAt(talkSession.getCompletedAt())
@@ -48,7 +48,7 @@ public class TalkSessionEntity extends BaseEntity {
     public TalkSession toTalkSession() {
         return TalkSession.builder()
                 .id(this.id)
-                .paidUserCreditHistoryId(this.paidUserCreditHistoryId)
+                .parentTalkId(this.parentTalkId)
                 .createdUserId(this.createdUserId)
                 .status(this.status)
                 .createdAt(this.getCreatedAt())

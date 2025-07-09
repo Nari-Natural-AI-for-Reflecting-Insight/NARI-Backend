@@ -5,9 +5,9 @@ import com.naribackend.core.credit.UserCreditHistory;
 
 public interface TalkSessionRepository {
 
-    int countBy(UserCreditHistory payedUserCreditHistory);
+    int countBy(Talk parentTalk);
 
-    boolean existsCompletedSessionBy(UserCreditHistory paidUserCreditHistory);
+    boolean existsCompletedSessionBy(Talk talk);
 
-    TalkSession save(TalkSession from);
+    TalkSession save(TalkSession talkSession);
 }

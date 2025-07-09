@@ -5,7 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface TalkSessionJpaRepository extends JpaRepository<TalkSessionEntity, Long> {
 
-    int countByPaidUserCreditHistoryId(Long paidUserCreditHistoryId);
+    int countByParentTalkId(Long talkId);
 
-    boolean existsByStatusAndPaidUserCreditHistoryId(TalkSessionStatus status, Long paidUserCreditHistoryId);
+    boolean existsByStatusAndParentTalkId(TalkSessionStatus status, Long talkId);
+
 }
