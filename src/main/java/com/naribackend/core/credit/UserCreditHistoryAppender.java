@@ -3,6 +3,7 @@ package com.naribackend.core.credit;
 import com.naribackend.core.common.CreditOperationReason;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
@@ -10,7 +11,8 @@ public class UserCreditHistoryAppender {
 
     private final UserCreditHistoryRepository userCreditHistoryRepository;
 
-    public void append(
+    @Transactional
+    public UserCreditHistory append(
             final Long createdUserId,
             final CreditOperationReason reason,
             final long changedCreditAmount,
@@ -23,6 +25,6 @@ public class UserCreditHistoryAppender {
                 currentCredit
         );
 
-        userCreditHistoryRepository.save(userCreditHistory);
+        return userCreditHistoryRepository.save(userCreditHistory);
     }
 }

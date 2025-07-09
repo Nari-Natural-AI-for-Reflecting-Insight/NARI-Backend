@@ -18,7 +18,8 @@ public class TokenController {
 
     private final TokenService tokenService;
 
-    @PostMapping("/realtime")
+    //@PostMapping("/realtime")
+    // 현재 사용하지 않는 API로 주석 처리
     public ApiResponse<GetRealtimeTokenResponse> createToken(
         @Parameter(hidden = true)
         @CurrentUser final LoginUser loginUser

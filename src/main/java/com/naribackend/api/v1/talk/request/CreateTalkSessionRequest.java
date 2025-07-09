@@ -8,7 +8,7 @@ import lombok.Builder;
 @Builder
 public record CreateTalkSessionRequest(
         @NotNull(message = "지불한 사용자 크레딧 히스토리 ID는 필수입니다.")
-        Long paidUserCreditHistoryId,
+        Long parentTalkId,
 
         @NotBlank(message = "Idempotency 키는 필수입니다.")
         String idempotencyKey
