@@ -43,6 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureRestDocs
 @AutoConfigureMockMvc
+@Disabled("현재 Realtime 임시 토큰 생성 API는 사용하지 않음")
 public class TokenIntegrationTest {
 
     @Autowired
