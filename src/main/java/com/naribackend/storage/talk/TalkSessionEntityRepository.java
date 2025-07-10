@@ -1,6 +1,6 @@
 package com.naribackend.storage.talk;
 
-import com.naribackend.core.credit.UserCreditHistory;
+import com.naribackend.core.talk.Talk;
 import com.naribackend.core.talk.TalkSession;
 import com.naribackend.core.talk.TalkSessionRepository;
 import com.naribackend.core.talk.TalkSessionStatus;
@@ -14,17 +14,17 @@ public class TalkSessionEntityRepository implements TalkSessionRepository {
     private final TalkSessionJpaRepository talkSessionJpaRepository;
 
     @Override
-    public int countBy(final UserCreditHistory payedUserCreditHistory) {
-        return talkSessionJpaRepository.countByPaidUserCreditHistoryId(
-                payedUserCreditHistory.getId()
+    public int countBy(final Talk parentTalk) {
+        return talkSessionJpaRepository.countByParentTalkId(
+                parentTalk.getId()
         );
     }
 
     @Override
-    public boolean existsCompletedSessionBy(final UserCreditHistory paidUserCreditHistory) {
-        return talkSessionJpaRepository.existsByStatusAndPaidUserCreditHistoryId(
+    public boolean existsCompletedSessionBy(final Talk talk) {
+        return talkSessionJpaRepository.existsByStatusAndParentTalkId(
                 TalkSessionStatus.COMPLETED,
-                paidUserCreditHistory.getId()
+                talk.getId()
         );
     }
 

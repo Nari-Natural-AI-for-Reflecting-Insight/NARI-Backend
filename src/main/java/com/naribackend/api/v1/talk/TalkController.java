@@ -2,10 +2,13 @@ package com.naribackend.api.v1.talk;
 
 import com.naribackend.api.v1.talk.request.CreateTalkSessionRequest;
 import com.naribackend.api.v1.talk.response.CreateTalkSessionResponse;
+import com.naribackend.api.v1.talk.response.GetTalkTopActiveInfoResponse;
 import com.naribackend.core.auth.CurrentUser;
 import com.naribackend.core.auth.LoginUser;
+import com.naribackend.core.talk.TalkService;
 import com.naribackend.core.talk.TalkSession;
 import com.naribackend.core.talk.TalkSessionService;
+import com.naribackend.core.talk.TalkTopActiveInfo;
 import com.naribackend.support.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -17,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/talk")
 public class TalkController {
+
+    private final TalkService talkService;
 
     private final TalkSessionService talkSessionService;
 
@@ -30,13 +35,28 @@ public class TalkController {
             @Valid @RequestBody final CreateTalkSessionRequest request
     ) {
         TalkSession talkSession = talkSessionService.createTalkSession(
-                request.paidUserCreditHistoryId(),
+                request.parentTalkId(),
                 loginUser,
                 request.toIdempotencyKey()
         );
 
         return ApiResponse.success(
                 CreateTalkSessionResponse.from(talkSession)
+        );
+    }
+
+    @Operation(
+            summary = "이용 가능한 Talk 중 하나의 Talk에 대해 상세 정보 조회",
+            description = "사용자가 이용 가능한 Talk를 하나에 대해 조회합니다. 이 API는 사용자가 Talk를 시작하기 전에 호출되어야 합니다."
+    )
+    @GetMapping("/top-active")
+    public ApiResponse<?> getTopActiveTalkInfo(
+            @Parameter(hidden = true) @CurrentUser final LoginUser loginUser
+    ) {
+        TalkTopActiveInfo topActiveTalkInfo = talkService.getTopActiveTalkInfo(loginUser);
+
+        return ApiResponse.success(
+                GetTalkTopActiveInfoResponse.from(topActiveTalkInfo)
         );
     }
 }

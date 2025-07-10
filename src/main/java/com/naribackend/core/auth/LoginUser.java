@@ -10,4 +10,10 @@ import lombok.RequiredArgsConstructor;
 public class LoginUser {
 
     private final long id;
+
+    public static LoginUser from(final long userId) {
+        return LoginUser.builder()
+                .id(userId)
+                .build();
+    }
 }

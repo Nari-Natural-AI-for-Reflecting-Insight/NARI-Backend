@@ -6,6 +6,7 @@ import com.naribackend.support.ApiResponseDocs;
 import com.naribackend.support.TestUser;
 import com.naribackend.support.TestUserFactory;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureRestDocs
 @AutoConfigureMockMvc
+@Disabled("현재 Realtime 임시 토큰 생성 API는 사용하지 않음")
 public class TokenIntegrationDocsTest {
 
     @Autowired

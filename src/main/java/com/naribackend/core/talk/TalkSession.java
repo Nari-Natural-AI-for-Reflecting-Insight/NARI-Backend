@@ -1,6 +1,5 @@
 package com.naribackend.core.talk;
 
-import com.naribackend.core.credit.UserCreditHistory;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -12,7 +11,7 @@ public class TalkSession {
 
     private Long id;
 
-    private final Long paidUserCreditHistoryId;
+    private final Long parentTalkId;
 
     private final Long createdUserId;
 
@@ -22,10 +21,10 @@ public class TalkSession {
 
     private LocalDateTime completedAt;
 
-    public static TalkSession from(final UserCreditHistory userCreditHistory) {
+    public static TalkSession from(final Talk parentTalk) {
         return TalkSession.builder()
-                .paidUserCreditHistoryId(userCreditHistory.getId())
-                .createdUserId(userCreditHistory.getCreatedUserId())
+                .parentTalkId(parentTalk.getId())
+                .createdUserId(parentTalk.getCreatedUserId())
                 .status(TalkSessionStatus.CREATED)
                 .build();
     }

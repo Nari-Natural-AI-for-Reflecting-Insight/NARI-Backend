@@ -21,18 +21,7 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
                     .requestMatchers(
-                            "/api/v1/auth/email-verification-code",
-                            "/api/v1/auth/email-verification-code/check",
-                            "/api/v1/auth/sign-up",
-                            "/api/v1/auth/sign-in/access-token",
-                            "/api/v1/auth/me",
-                            "/api/v1/user/me/withdrawal",
-                            "/api/v1/user/me/password",
-                            "/api/v1/user/me/nickname",
-                            "/api/v1/token/realtime",
-                            "/api/v1/ops/credit/charge",
-                            "/api/v1/credit/pay",
-                            "/api/v1/talk/**"
+                            "/api/v1/**"
                     ).permitAll()
                     .requestMatchers(
                             "/v3/api-docs/**",

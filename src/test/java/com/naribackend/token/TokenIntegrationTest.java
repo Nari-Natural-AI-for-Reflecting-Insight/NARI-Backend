@@ -10,6 +10,7 @@ import com.naribackend.support.TestUser;
 import com.naribackend.support.TestUserFactory;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -42,6 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureRestDocs
 @AutoConfigureMockMvc
+@Disabled("현재 Realtime 임시 토큰 생성 API는 사용하지 않음")
 public class TokenIntegrationTest {
 
     @Autowired
@@ -195,7 +197,9 @@ public class TokenIntegrationTest {
         }
     }
 
+
     @RepeatedTest(5)
+    @Disabled("현재 Realtime 임시 토큰 생성 API는 사용하지 않음")
     @DisplayName("Realtime 임시 토큰 생성 API 성공 - 동시 요청 처리")
     void create_realtime_token_concurrent_requests_success() throws Exception {
 

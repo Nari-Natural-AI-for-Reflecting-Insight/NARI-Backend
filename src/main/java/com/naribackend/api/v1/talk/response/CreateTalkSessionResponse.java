@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Builder
 public record CreateTalkSessionResponse (
         Long talkSessionId,
-        Long paidUserCreditHistoryId,
+        Long parentTalkId,
         Long createdUserId,
         TalkSessionStatus status,
         LocalDateTime createdAt,
@@ -18,7 +18,7 @@ public record CreateTalkSessionResponse (
     public static CreateTalkSessionResponse from(final TalkSession talkSession) {
         return CreateTalkSessionResponse.builder()
                 .talkSessionId(talkSession.getId())
-                .paidUserCreditHistoryId(talkSession.getPaidUserCreditHistoryId())
+                .parentTalkId(talkSession.getParentTalkId())
                 .createdUserId(talkSession.getCreatedUserId())
                 .status(talkSession.getStatus())
                 .createdAt(talkSession.getCreatedAt())
