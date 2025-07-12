@@ -33,4 +33,12 @@ public class TalkSession {
         this.status = TalkSessionStatus.COMPLETED;
         this.completedAt = currentTime;
     }
+
+    public boolean isUserCreated(final Long userId) {
+        return this.createdUserId.equals(userId);
+    }
+
+    public boolean isCompleted() {
+        return this.status == TalkSessionStatus.COMPLETED;
+    }
 }

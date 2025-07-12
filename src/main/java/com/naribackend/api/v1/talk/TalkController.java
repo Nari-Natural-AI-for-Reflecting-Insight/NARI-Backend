@@ -1,5 +1,6 @@
 package com.naribackend.api.v1.talk;
 
+import com.naribackend.api.v1.talk.request.CreateSessionItemRequest;
 import com.naribackend.api.v1.talk.request.CreateTalkSessionRequest;
 import com.naribackend.api.v1.talk.response.CreateTalkSessionResponse;
 import com.naribackend.api.v1.talk.response.GetTalkTopActiveInfoResponse;
@@ -43,6 +44,24 @@ public class TalkController {
         return ApiResponse.success(
                 CreateTalkSessionResponse.from(talkSession)
         );
+    }
+
+    @Operation(
+            summary = "Talk Item 생성",
+            description = "Talk Session에 대한 대화 아이템을 생성합니다. 이 API는 대화가 진행되는 동안 호출되어야 합니다."
+    )
+    @PostMapping("/session/{sessionId}/item")
+    public ApiResponse<?> createSessionItem(
+            @Parameter(hidden = true) @CurrentUser final LoginUser loginUser,
+            @PathVariable final Long sessionId,
+            @Valid @RequestBody final CreateSessionItemRequest request
+    ) {
+        talkSessionService.createSessionItem(
+                loginUser,
+                request.toSessionItem(sessionId)
+        );
+
+        return ApiResponse.success();
     }
 
     @Operation(

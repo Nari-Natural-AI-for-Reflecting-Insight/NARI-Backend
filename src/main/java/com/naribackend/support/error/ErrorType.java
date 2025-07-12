@@ -34,6 +34,16 @@ public enum ErrorType {
     INVALID_CREDIT_OPERATION(HttpStatus.BAD_REQUEST, ErrorCode.E400, "잘못된 크레딧 연산입니다.", LogLevel.DEBUG),
     INVALID_CREDIT_OPERATION_REASON(HttpStatus.BAD_REQUEST, ErrorCode.E500, "잘못된 크레딧 연산 사유입니다.", LogLevel.DEBUG),
     INVALID_IDEMPOTENCY_KEY(HttpStatus.BAD_REQUEST, ErrorCode.E400, "중복된 요청 입니다.", LogLevel.DEBUG),
+    INVALID_SESSION_ITEM_ROLE(HttpStatus.BAD_REQUEST, ErrorCode.E400, "잘못된 세션 아이템 역할입니다.", LogLevel.DEBUG),
+    INVALID_CONTENT_TYPE(HttpStatus.UNSUPPORTED_MEDIA_TYPE, ErrorCode.E400, "지원하지 않는 콘텐츠 타입입니다.", LogLevel.DEBUG),
+    TALK_SESSION_COMPLETED(HttpStatus.CONFLICT, ErrorCode.E409, "이미 완료된 대화 세션입니다.", LogLevel.INFO),
+    TALK_SESSION_NOT_FOUND(HttpStatus.NOT_FOUND, ErrorCode.E404, "해당 대화 세션을 찾을 수 없습니다.", LogLevel.INFO),
+    TALK_ALREADY_COMPLETED(
+            HttpStatus.CONFLICT,
+            ErrorCode.E409,
+            "해당 대화는 이미 완료되었습니다.",
+            LogLevel.INFO
+    ),
 
     INVALID_USER_REQUEST_TALK_SESSION(
             HttpStatus.FORBIDDEN,

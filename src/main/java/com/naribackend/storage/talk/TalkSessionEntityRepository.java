@@ -7,6 +7,8 @@ import com.naribackend.core.talk.TalkSessionStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 @RequiredArgsConstructor
 public class TalkSessionEntityRepository implements TalkSessionRepository {
@@ -35,5 +37,11 @@ public class TalkSessionEntityRepository implements TalkSessionRepository {
         );
 
         return savedEntity.toTalkSession();
+    }
+
+    @Override
+    public Optional<TalkSession> findById(Long talkSessionId) {
+        return talkSessionJpaRepository.findById(talkSessionId)
+                .map(TalkSessionEntity::toTalkSession);
     }
 }
