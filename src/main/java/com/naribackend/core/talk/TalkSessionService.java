@@ -77,6 +77,7 @@ public class TalkSessionService {
     }
 
 
+    @Transactional
     public void createSessionItem(
             final LoginUser loginUser,
             final SessionItem sessionItem
