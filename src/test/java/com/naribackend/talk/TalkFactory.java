@@ -48,6 +48,31 @@ public class TalkFactory {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public Talk createTalk(
+            final long createdUserId,
+            final TalkStatus talkStatus
+    ) {
+        var userCreditHistory = UserCreditHistory.builder()
+                .createdUserId(createdUserId)
+                .reason(CreditOperationReason.DAILY_COUNSELING)
+                .changedCreditAmount(-1000L)
+                .currentCredit(Credit.from(10000L))
+                .build();
+
+        var savedPaidUserCreditHistory = userCreditHistoryRepository.save(userCreditHistory);
+
+        Talk talk = Talk.builder()
+                .createdUserId(createdUserId)
+                .paidUserCreditHistoryId(savedPaidUserCreditHistory.getId())
+                .status(talkStatus)
+                .expiredAt(dateTimeProvider.getCurrentDateTime()
+                        .plusMinutes(30))
+                .build();
+
+        return talkRepository.save(talk);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Talk createTalkWithSession (
             final long createdUserId,
             final int childTalkSessionNum,
