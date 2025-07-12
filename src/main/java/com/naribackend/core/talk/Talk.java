@@ -36,4 +36,8 @@ public class Talk {
         this.status = TalkStatus.COMPLETED;
         this.modifiedAt = currentTime;
     }
+
+    public boolean isCompleted() {
+        return this.status == TalkStatus.COMPLETED;
+    }
 }
