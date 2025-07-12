@@ -19,7 +19,7 @@ public class SessionItemEntity {
     @Id
     private String sessionItemId;
 
-    @Column(name = "talk_session_id", nullable = false, updatable = false, unique = true)
+    @Column(name = "talk_session_id", nullable = false, updatable = false)
     private Long talkSessionId;
 
     @Enumerated(EnumType.STRING)
