@@ -73,7 +73,6 @@ public class SessionItemIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(sessionItemRequest))
                         .header("Authorization", "Bearer " + testUser.accessToken())
-                        .content(objectMapper.writeValueAsString(sessionItemRequest))
         ).andExpect(status().isOk());
 
         // then
