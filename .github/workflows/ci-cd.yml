@@ -31,7 +31,7 @@ jobs:
       - name: Build & Test
         run: |
           chmod +x gradlew
-          ./gradlew clean build --warning-mode all
+          ./gradlew clean build --warning-mode all --scan
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
@@ -63,3 +63,10 @@ jobs:
           fi
           docker push $IMAGE:$TAG
           docker push $IMAGE:latest
+          
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report
+          path: build/reports/tests/test
