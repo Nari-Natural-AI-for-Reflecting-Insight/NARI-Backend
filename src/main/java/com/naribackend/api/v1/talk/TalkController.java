@@ -27,6 +27,20 @@ public class TalkController {
     private final TalkSessionService talkSessionService;
 
     @Operation(
+            summary = "Talk 종료",
+            description = "Talk Session을 종료합니다. 이 API는 Talk가 종료될 때 호출되어야 합니다."
+    )
+    @PostMapping("/{talkId}/complete")
+    public ApiResponse<?> completeTalk(
+            @Parameter(hidden = true) @CurrentUser final LoginUser loginUser,
+            @PathVariable final Long talkId
+    ) {
+        talkService.completeTalk(loginUser, talkId);
+
+        return ApiResponse.success();
+    }
+
+    @Operation(
             summary = "Talk Session 생성",
             description = "실시간 대화와 관련된 정보를 기록하는 Talk Session을 생성합니다. 이 API는 외부 대화 Session 이 시작될 때 호출되어야 합니다."
     )

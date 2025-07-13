@@ -40,7 +40,7 @@ public class TalkSessionService {
                 .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_TALK));
 
         if (!parentTalk.isUserCreated(loginUser)) {
-            throw new CoreException(ErrorType.INVALID_USER_REQUEST_TALK_SESSION);
+            throw new CoreException(ErrorType.INVALID_USER_REQUEST);
         }
 
         // 결제된 크레딧 이력의 최소 유효 날짜 시간 확인

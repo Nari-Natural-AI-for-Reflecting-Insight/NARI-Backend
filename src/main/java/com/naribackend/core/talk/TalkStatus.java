@@ -5,7 +5,7 @@ public enum TalkStatus {
     CREATED,
     IN_PROGRESS,
     COMPLETED,
-    CANCELLED;
+    CANCELED;
 
     public boolean isCompleted() {
         return this == COMPLETED;

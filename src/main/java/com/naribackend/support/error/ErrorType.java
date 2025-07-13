@@ -38,13 +38,13 @@ public enum ErrorType {
     INVALID_CONTENT_TYPE(HttpStatus.UNSUPPORTED_MEDIA_TYPE, ErrorCode.E400, "지원하지 않는 콘텐츠 타입입니다.", LogLevel.DEBUG),
     TALK_SESSION_COMPLETED(HttpStatus.CONFLICT, ErrorCode.E409, "이미 완료된 대화 세션입니다.", LogLevel.INFO),
     TALK_SESSION_NOT_FOUND(HttpStatus.NOT_FOUND, ErrorCode.E404, "해당 대화 세션을 찾을 수 없습니다.", LogLevel.INFO),
+    INVALID_USER_REQUEST(HttpStatus.FORBIDDEN, ErrorCode.E403, "해당 요청은 권한이 없습니다.", LogLevel.INFO),
     TALK_ALREADY_COMPLETED(
             HttpStatus.CONFLICT,
             ErrorCode.E409,
             "해당 대화는 이미 완료되었습니다.",
-            LogLevel.INFO
+            LogLevel.DEBUG
     ),
-
     INVALID_USER_REQUEST_TALK_SESSION(
             HttpStatus.FORBIDDEN,
             ErrorCode.E403,
