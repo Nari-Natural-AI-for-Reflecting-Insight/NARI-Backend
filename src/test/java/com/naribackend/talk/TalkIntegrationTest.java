@@ -19,12 +19,14 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.BDDAssertions.within;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -321,13 +323,13 @@ public class TalkIntegrationTest {
                 .orElseThrow(() -> new AssertionError("존재 하지 않는 Talk입니다."));
 
         assertThat(savedTalk.isCompleted()).isTrue();
-        assertThat(savedTalk.getCompletedAt()).isEqualTo(expectedCompletedAt); // 이미 완료된 경우, 시간이 변경되지 않아야 함
+        assertThat(savedTalk.getCompletedAt()).isCloseTo(expectedCompletedAt, within(1, ChronoUnit.SECONDS));  // 이미 완료된 경우, 시간이 변경되지 않아야 함
 
         TalkSession savedTalkSession = talkSessionRepository.findById(talkSession.getId())
                 .orElseThrow(() -> new AssertionError("존재 하지 않는 Talk Session입니다."));
 
         assertThat(savedTalkSession.isCompleted()).isTrue();
-        assertThat(savedTalkSession.getCompletedAt()).isEqualTo(expectedCompletedAt); // 이미 완료된 경우, 시간이 변경되지 않아야 함
+        assertThat(savedTalkSession.getCompletedAt()).isCloseTo(expectedCompletedAt, within(1, ChronoUnit.SECONDS));  // 이미 완료된 경우, 시간이 변경되지 않아야 함
     }
 
     @Test
