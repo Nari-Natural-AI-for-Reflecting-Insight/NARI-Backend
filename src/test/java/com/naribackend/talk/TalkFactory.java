@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Component
 @RequiredArgsConstructor
 public class TalkFactory {
@@ -105,8 +107,9 @@ public class TalkFactory {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Talk createCompletedTalk(
-            final long createdUserId
-    ) {
+            final long createdUserId,
+            final LocalDateTime completedAt
+            ) {
         var userCreditHistory = UserCreditHistory.builder()
                 .createdUserId(createdUserId)
                 .reason(CreditOperationReason.DAILY_COUNSELING)
@@ -122,7 +125,7 @@ public class TalkFactory {
                 .status(TalkStatus.CREATED)
                 .build();
 
-        talk.complete(dateTimeProvider.getCurrentDateTime());
+        talk.complete(completedAt);
 
         return talkRepository.save(talk);
     }

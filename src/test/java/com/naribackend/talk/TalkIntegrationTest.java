@@ -302,13 +302,10 @@ public class TalkIntegrationTest {
         // given
         TestUser testUser = testUserFactory.createTestUser();
 
-        LocalDateTime expectedCompletedAt = LocalDateTime.now().minusHours(1);
+        LocalDateTime expectedCompletedAt = LocalDateTime.now();
 
-        when(dateTimeProvider.getCurrentDateTime())
-                .thenReturn(expectedCompletedAt);
-
-        Talk alreadyCompletedTalk = talkFactory.createCompletedTalk(testUser.id());
-        TalkSession talkSession = talkSessionFactory.createdCompletedTalkSession(alreadyCompletedTalk);
+        Talk alreadyCompletedTalk = talkFactory.createCompletedTalk(testUser.id(), expectedCompletedAt);
+        TalkSession talkSession = talkSessionFactory.createdCompletedTalkSession(alreadyCompletedTalk, expectedCompletedAt);
 
         when(dateTimeProvider.getCurrentDateTime())
                 .thenReturn(expectedCompletedAt.plusHours(1));
