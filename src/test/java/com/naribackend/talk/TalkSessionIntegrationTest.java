@@ -133,7 +133,7 @@ public class TalkSessionIntegrationTest {
                 .idempotencyKey(IDEMPOTENCY_KEY)
                 .build();
 
-        ErrorType expectedErrorType = ErrorType.NOT_FOUND_TALK;
+        ErrorType expectedErrorType = ErrorType.INVALID_USER_REQUEST;
 
         // when & then
         mockMvc.perform(post(TALK_SESSION_PATH)
@@ -187,7 +187,7 @@ public class TalkSessionIntegrationTest {
                 .idempotencyKey(IDEMPOTENCY_KEY)
                 .build();
 
-        ErrorType expectedErrorType = ErrorType.INVALID_USER_REQUEST_TALK_SESSION;
+        ErrorType expectedErrorType = ErrorType.INVALID_USER_REQUEST;
 
         // when & then
         mockMvc.perform(post(TALK_SESSION_PATH)

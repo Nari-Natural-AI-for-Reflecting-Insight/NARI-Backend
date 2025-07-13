@@ -1,6 +1,7 @@
 package com.naribackend.talk;
 
 import com.jayway.jsonpath.JsonPath;
+import com.naribackend.core.DateTimeProvider;
 import com.naribackend.core.auth.LoginUser;
 import com.naribackend.core.idempotency.IdempotencyKey;
 import com.naribackend.core.talk.*;
@@ -13,16 +14,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ActiveProfiles("test")
@@ -49,9 +54,23 @@ public class TalkIntegrationTest {
     @Autowired
     private TalkPolicyProperties talkPolicyProperties;
 
+    @Autowired
+    private TalkRepository talkRepository;
+
+    @Autowired
+    private TalkSessionRepository talkSessionRepository;
+
+    @Autowired
+    private TalkSessionFactory talkSessionFactory;
+
     private static final String TOP_ACTIVE_TALK_API_PATH = "/api/v1/talk/top-active";
 
+    private static final String TALK_COMPLETED_API_PATH = "/api/v1/talk/{talkId}/complete";
+
     private static final String IDEMPOTENCY_KEY = "top-active-talk";
+
+    @MockitoSpyBean
+    private DateTimeProvider dateTimeProvider;
 
     @Test
     @DisplayName("top active talk 조회 API 성공")
@@ -210,4 +229,137 @@ public class TalkIntegrationTest {
         assertThat(topActiveTalkInfo.isExistsActiveTalk()).isFalse();
     }
 
+
+    @Test
+    @DisplayName("Talk 완료 API 성공")
+    void complete_talk_api_success() throws Exception {
+        // given
+        TestUser testUser = testUserFactory.createTestUser();
+        Talk talk = talkFactory.createTalk(testUser.id());
+        TalkSession talkSession = talkSessionFactory.createTalkSession(talk);
+
+        // when & then
+        mockMvc.perform(
+                post(TALK_COMPLETED_API_PATH, talk.getId())
+                        .header("Authorization", "Bearer " + testUser.accessToken())
+        ).andExpect(status().isOk());
+
+        // then
+        Talk completedTalk = talkRepository.findById(talk.getId())
+                .orElseThrow(() -> new AssertionError("존재 하지 않는 Talk입니다."));
+
+        assertThat(completedTalk.isCompleted()).isTrue();
+
+        TalkSession savedTalkSession = talkSessionRepository.findById(talkSession.getId())
+                .orElseThrow(() -> new AssertionError("존재 하지 않는 Talk Session입니다."));
+
+        assertThat(savedTalkSession.isCompleted()).isTrue();
+    }
+
+    void assertTalkSessionStatus(
+            final Long targetTalkSessionId,
+            final TalkSessionStatus expectedStatus
+    ) {
+        TalkSession savedTalkSession = talkSessionRepository.findById(targetTalkSessionId)
+                .orElseThrow(() -> new AssertionError("존재 하지 않는 Talk Session입니다."));
+
+        assertThat(savedTalkSession.getStatus()).isEqualTo(expectedStatus);
+    }
+
+    @Test
+    @DisplayName("Talk 완료 API 성공 - Talk Session status가 CANCELED 아닌 status만 변경하는지 검사")
+    void complete_talk_api_success_check_only_change_not_canceled_status() throws Exception {
+        // given
+        TestUser testUser = testUserFactory.createTestUser();
+        Talk talk = talkFactory.createTalk(testUser.id());
+
+        TalkSession createdTalkSession = talkSessionFactory.createTalkSession(talk, TalkSessionStatus.CREATED);
+        TalkSession canceledTalkSession = talkSessionFactory.createTalkSession(talk, TalkSessionStatus.CANCELED);
+        TalkSession inprogressTalkSession = talkSessionFactory.createTalkSession(talk, TalkSessionStatus.IN_PROGRESS);
+        TalkSession completedTalkSession = talkSessionFactory.createTalkSession(talk, TalkSessionStatus.COMPLETED);
+
+        // when
+        mockMvc.perform(
+                post(TALK_COMPLETED_API_PATH, talk.getId())
+                        .header("Authorization", "Bearer " + testUser.accessToken())
+        ).andExpect(status().isOk());
+
+        // then
+        Talk completedTalk = talkRepository.findById(talk.getId())
+                .orElseThrow(() -> new AssertionError("존재 하지 않는 Talk입니다."));
+
+        assertThat(completedTalk.isCompleted()).isTrue();
+
+        assertTalkSessionStatus(createdTalkSession.getId(), TalkSessionStatus.COMPLETED);
+        assertTalkSessionStatus(canceledTalkSession.getId(), TalkSessionStatus.CANCELED);
+        assertTalkSessionStatus(completedTalkSession.getId(), TalkSessionStatus.COMPLETED);
+        assertTalkSessionStatus(inprogressTalkSession.getId(), TalkSessionStatus.COMPLETED);
+    }
+
+    @Test
+    @DisplayName("Talk 완료 API 성공 - Talk가 이미 완료된 경우")
+    void complete_talk_api_success_already_completed_talk() throws Exception {
+        // given
+        TestUser testUser = testUserFactory.createTestUser();
+
+        LocalDateTime expectedCompletedAt = LocalDateTime.now().minusHours(1);
+
+        when(dateTimeProvider.getCurrentDateTime())
+                .thenReturn(expectedCompletedAt);
+
+        Talk alreadyCompletedTalk = talkFactory.createCompletedTalk(testUser.id());
+        TalkSession talkSession = talkSessionFactory.createdCompletedTalkSession(alreadyCompletedTalk);
+
+        when(dateTimeProvider.getCurrentDateTime())
+                .thenReturn(expectedCompletedAt.plusHours(1));
+
+        // when & then
+        mockMvc.perform(
+                post(TALK_COMPLETED_API_PATH, alreadyCompletedTalk.getId())
+                        .header("Authorization", "Bearer " + testUser.accessToken())
+        ).andExpect(status().isOk());
+
+        // then
+        Talk savedTalk = talkRepository.findById(alreadyCompletedTalk.getId())
+                .orElseThrow(() -> new AssertionError("존재 하지 않는 Talk입니다."));
+
+        assertThat(savedTalk.isCompleted()).isTrue();
+        assertThat(savedTalk.getCompletedAt()).isEqualTo(expectedCompletedAt); // 이미 완료된 경우, 시간이 변경되지 않아야 함
+
+        TalkSession savedTalkSession = talkSessionRepository.findById(talkSession.getId())
+                .orElseThrow(() -> new AssertionError("존재 하지 않는 Talk Session입니다."));
+
+        assertThat(savedTalkSession.isCompleted()).isTrue();
+        assertThat(savedTalkSession.getCompletedAt()).isEqualTo(expectedCompletedAt); // 이미 완료된 경우, 시간이 변경되지 않아야 함
+    }
+
+    @Test
+    @DisplayName("Talk 완료 API 실패 - 권한이 없는 사용자")
+    void complete_talk_api_fail_not_authorized_user() throws Exception {
+        // given
+        TestUser testUser = testUserFactory.createTestUser();
+        Talk talk = talkFactory.createTalk(testUser.id());
+
+        TestUser forbiddenUser = testUserFactory.createTestUser();
+
+        // when & then
+        mockMvc.perform(
+                post(TALK_COMPLETED_API_PATH, talk.getId())
+                        .header("Authorization", "Bearer " + forbiddenUser.accessToken())
+        ).andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("Talk 완료 API 실패 - 로그인 하지 않은 사용자")
+    void complete_talk_api_fail_not_logged_in_user() throws Exception {
+        // given
+        TestUser testUser = testUserFactory.createTestUser();
+        Talk talk = talkFactory.createTalk(testUser.id());
+
+        // when & then
+        mockMvc.perform(
+                post(TALK_COMPLETED_API_PATH, talk.getId())
+                        .header("Authorization", "Bearer ")
+        ).andExpect(status().isUnauthorized());
+    }
 }

@@ -1,9 +1,7 @@
 package com.naribackend.talk;
 
 import com.naribackend.core.DateTimeProvider;
-import com.naribackend.core.talk.Talk;
-import com.naribackend.core.talk.TalkSession;
-import com.naribackend.core.talk.TalkSessionRepository;
+import com.naribackend.core.talk.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -11,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
-public class SessionFactory {
+public class TalkSessionFactory {
 
     private final TalkSessionRepository talkSessionRepository;
 
@@ -20,6 +18,17 @@ public class SessionFactory {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public TalkSession createTalkSession(final Talk parentTalk) {
         TalkSession talkSession = TalkSession.from(parentTalk);
+
+        return talkSessionRepository.save(talkSession);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public TalkSession createTalkSession(final Talk parentTalk, final TalkSessionStatus status) {
+        TalkSession talkSession = TalkSession.builder()
+                .parentTalkId(parentTalk.getId())
+                .createdUserId(parentTalk.getCreatedUserId())
+                .status(status)
+                .build();
 
         return talkSessionRepository.save(talkSession);
     }

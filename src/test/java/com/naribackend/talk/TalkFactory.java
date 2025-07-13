@@ -65,8 +65,6 @@ public class TalkFactory {
                 .createdUserId(createdUserId)
                 .paidUserCreditHistoryId(savedPaidUserCreditHistory.getId())
                 .status(talkStatus)
-                .expiredAt(dateTimeProvider.getCurrentDateTime()
-                        .plusMinutes(30))
                 .build();
 
         return talkRepository.save(talk);
@@ -103,5 +101,29 @@ public class TalkFactory {
         }
 
         return savedParentTalk;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public Talk createCompletedTalk(
+            final long createdUserId
+    ) {
+        var userCreditHistory = UserCreditHistory.builder()
+                .createdUserId(createdUserId)
+                .reason(CreditOperationReason.DAILY_COUNSELING)
+                .changedCreditAmount(-1000L)
+                .currentCredit(Credit.from(10000L))
+                .build();
+
+        var savedPaidUserCreditHistory = userCreditHistoryRepository.save(userCreditHistory);
+
+        Talk talk = Talk.builder()
+                .createdUserId(createdUserId)
+                .paidUserCreditHistoryId(savedPaidUserCreditHistory.getId())
+                .status(TalkStatus.CREATED)
+                .build();
+
+        talk.complete(dateTimeProvider.getCurrentDateTime());
+
+        return talkRepository.save(talk);
     }
 }
