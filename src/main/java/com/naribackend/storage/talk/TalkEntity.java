@@ -31,7 +31,11 @@ public class TalkEntity extends BaseEntity {
     @Column(name = "status", nullable = false)
     private TalkStatus status;
 
+    @Column(name = "expired_at")
     private LocalDateTime expiredAt;
+
+    @Column(name = "completed_at")
+    private LocalDateTime completedAt;
 
     public static TalkEntity from(final Talk talk) {
         return TalkEntity.builder()
@@ -40,6 +44,7 @@ public class TalkEntity extends BaseEntity {
                 .paidUserCreditHistoryId(talk.getPaidUserCreditHistoryId())
                 .status(talk.getStatus())
                 .expiredAt(talk.getExpiredAt())
+                .completedAt(talk.getCompletedAt())
                 .build();
     }
 
@@ -52,6 +57,7 @@ public class TalkEntity extends BaseEntity {
                 .createdAt(this.getCreatedAt())
                 .modifiedAt(this.getModifiedAt())
                 .expiredAt(this.expiredAt)
+                .completedAt(this.completedAt)
                 .build();
     }
 }

@@ -42,7 +42,7 @@ public class SessionItemIntegrationTest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private SessionFactory sessionFactory;
+    private TalkSessionFactory talkSessionFactory;
 
     @Autowired
     private SessionItemRepository sessionItemRepository;
@@ -59,7 +59,7 @@ public class SessionItemIntegrationTest {
         // given
         TestUser testUser = testUserFactory.createTestUser();
         Talk parentTalk = talkFactory.createTalk(testUser.id());
-        TalkSession talkSession = sessionFactory.createTalkSession(parentTalk);
+        TalkSession talkSession = talkSessionFactory.createTalkSession(parentTalk);
         CreateSessionItemRequest sessionItemRequest = CreateSessionItemRequest.builder()
                 .sessionItemId(getSessionItemId())
                 .sessionItemRole(SessionItemRole.USER.toString())
@@ -117,7 +117,7 @@ public class SessionItemIntegrationTest {
         TestUser testUser = testUserFactory.createTestUser();
 
         Talk parentTalk = talkFactory.createTalk(testUser.id());
-        TalkSession talkSession = sessionFactory.createdCompletedTalkSession(parentTalk);
+        TalkSession talkSession = talkSessionFactory.createdCompletedTalkSession(parentTalk);
 
         CreateSessionItemRequest sessionItemRequest = CreateSessionItemRequest.builder()
                 .sessionItemId(getSessionItemId())
@@ -148,7 +148,7 @@ public class SessionItemIntegrationTest {
         TestUser testUser = testUserFactory.createTestUser();
 
         Talk parentTalk = talkFactory.createTalk(testUser.id(), TalkStatus.COMPLETED);
-        TalkSession talkSession = sessionFactory.createTalkSession(parentTalk);
+        TalkSession talkSession = talkSessionFactory.createTalkSession(parentTalk);
 
         CreateSessionItemRequest sessionItemRequest = CreateSessionItemRequest.builder()
                 .sessionItemId(getSessionItemId())
@@ -180,7 +180,7 @@ public class SessionItemIntegrationTest {
         TestUser otherTestUser = testUserFactory.createTestUser();
 
         Talk parentTalk = talkFactory.createTalk(testUser.id());
-        TalkSession talkSession = sessionFactory.createTalkSession(parentTalk);
+        TalkSession talkSession = talkSessionFactory.createTalkSession(parentTalk);
 
         CreateSessionItemRequest sessionItemRequest = CreateSessionItemRequest.builder()
                 .sessionItemId(getSessionItemId())

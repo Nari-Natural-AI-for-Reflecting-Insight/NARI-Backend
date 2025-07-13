@@ -1,6 +1,8 @@
 package com.naribackend.core.talk;
 
 import com.naribackend.core.auth.LoginUser;
+import com.naribackend.support.error.CoreException;
+import com.naribackend.support.error.ErrorType;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -24,6 +26,8 @@ public class Talk {
 
     private LocalDateTime expiredAt;
 
+    private LocalDateTime completedAt;
+
     boolean isUserCreated(final LoginUser loginUser) {
         return this.createdUserId.equals(loginUser.getId());
     }
@@ -32,9 +36,14 @@ public class Talk {
         return this.createdAt.isBefore(minimumValidDateTime);
     }
 
-    public void complete(final LocalDateTime currentTime) {
+    public void complete(final LocalDateTime completedAt) {
+
+        if(this.isCompleted()) {
+            throw new CoreException(ErrorType.TALK_ALREADY_COMPLETED);
+        }
+
         this.status = TalkStatus.COMPLETED;
-        this.modifiedAt = currentTime;
+        this.completedAt = completedAt;
     }
 
     public boolean isCompleted() {
