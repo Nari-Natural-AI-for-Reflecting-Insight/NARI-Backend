@@ -31,7 +31,7 @@ jobs:
       - name: Build & Test
         run: |
           chmod +x gradlew
-          ./gradlew clean build --info --stacktrac
+          ./gradlew clean build --warning-mode all
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
