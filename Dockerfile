@@ -10,5 +10,8 @@ COPY --chown=spring:spring ${JAR_FILE} app.jar
 
 USER spring
 
+# 한국 시간 설정
+ENV TZ=Asia/Seoul
+
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]

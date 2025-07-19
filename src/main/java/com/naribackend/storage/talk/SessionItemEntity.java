@@ -30,7 +30,7 @@ public class SessionItemEntity {
     @Column(name = "content_type", nullable = false)
     private ContentType contentType;
 
-    @Column(name = "content_text", nullable = false)
+    @Column(name = "content_text", nullable = false, length = 5000)
     private String contentText;
 
     public static SessionItemEntity from(final SessionItem sessionItem) {

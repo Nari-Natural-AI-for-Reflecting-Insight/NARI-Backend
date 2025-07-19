@@ -6,6 +6,7 @@ import com.naribackend.support.error.ErrorType;
 import java.util.Locale;
 
 public enum ContentType {
+    MESSAGE,
     INPUT_TEXT, // User's input in text format
     INPUT_AUDIO, // User's input in text format
     AUDIO; // Assistant's response in audio format
