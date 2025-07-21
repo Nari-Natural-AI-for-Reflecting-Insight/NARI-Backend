@@ -15,7 +15,7 @@ public class UserCreditModifier {
     @Transactional
     public Credit payCredit(final long targetUserId, final PayCreditOperation operation) {
 
-        UserCredit userCredit = userCreditRepository.getUserCredit(targetUserId)
+        UserCredit userCredit = userCreditRepository.findUserCreditBy(targetUserId)
                 .orElseThrow(() -> new CoreException(ErrorType.NOT_SUFFICIENT_CREDIT));
 
         if (userCredit.hasLessThan(operation.getCreditToPay())) {

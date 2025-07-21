@@ -344,7 +344,8 @@ class AuthIntegrationDocsTest {
                         ApiResponseDocs.SUCCESS_FIELDS(
                                 fieldWithPath("data.id").description("사용자 계정 테이블의 primary key"),
                                 fieldWithPath("data.email").description("이메일"),
-                                fieldWithPath("data.nickname").description("닉네임")
+                                fieldWithPath("data.nickname").description("닉네임"),
+                                fieldWithPath("data.currentCreditAmount").description("현재 크레딧 잔액")
                         )
                 ))
         );

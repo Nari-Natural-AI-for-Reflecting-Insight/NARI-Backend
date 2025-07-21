@@ -6,10 +6,7 @@ import com.naribackend.api.v1.auth.request.GetAccessTokenRequest;
 import com.naribackend.api.v1.auth.request.SendVerificationCodeRequest;
 import com.naribackend.api.v1.auth.response.GetAccessTokenResponse;
 import com.naribackend.api.v1.auth.response.GetUserInfoResponse;
-import com.naribackend.core.auth.AuthService;
-import com.naribackend.core.auth.CurrentUser;
-import com.naribackend.core.auth.LoginUser;
-import com.naribackend.core.auth.UserAccount;
+import com.naribackend.core.auth.*;
 import com.naribackend.support.error.CoreException;
 import com.naribackend.support.error.ErrorType;
 import com.naribackend.support.response.ApiResponse;
@@ -90,8 +87,8 @@ public class AuthController {
     public ApiResponse<?> getMe(
             @Parameter(hidden = true) @CurrentUser LoginUser loginUser
     ) {
-        UserAccount currentUserAccount = authService.getUserAccountBy(loginUser);
-        GetUserInfoResponse loginUserInfo = GetUserInfoResponse.from(currentUserAccount);
+        UserAccountInfo currentUserAccountInfo = authService.getUserAccountInfoBy(loginUser);
+        GetUserInfoResponse loginUserInfo = GetUserInfoResponse.from(currentUserAccountInfo);
 
         return ApiResponse.success(loginUserInfo);
     }

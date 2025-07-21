@@ -15,7 +15,7 @@ public class UserCreditEntityRepository implements UserCreditRepository {
     private final UserCreditJpaRepository userCreditJpaRepository;
 
     @Override
-    public Optional<UserCredit> getUserCredit(Long targetUserId) {
+    public Optional<UserCredit> findUserCreditBy(Long targetUserId) {
         return userCreditJpaRepository.findUserCreditEntityByUserId(targetUserId)
                 .map(UserCreditEntity::toUserCredit);
     }

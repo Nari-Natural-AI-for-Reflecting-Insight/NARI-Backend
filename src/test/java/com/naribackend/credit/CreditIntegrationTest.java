@@ -9,7 +9,6 @@ import com.naribackend.core.idempotency.IdempotencyKey;
 import com.naribackend.core.idempotency.IdempotencyRepository;
 import com.naribackend.core.talk.TalkAppender;
 import com.naribackend.storage.credit.UserCreditHistoryJpaRepository;
-import com.naribackend.storage.talk.TalkEntityRepository;
 import com.naribackend.storage.talk.TalkJpaRepository;
 import com.naribackend.support.TestUser;
 import com.naribackend.support.TestUserFactory;
@@ -100,7 +99,7 @@ public class CreditIntegrationTest {
         // then
         assertThat(idempotencyRepository.exists(IdempotencyKey.from(IDEMPOTENCY_KEY))).isTrue();
 
-        long actualUserCreditAmount = userCreditRepository.getUserCredit(testUser.id())
+        long actualUserCreditAmount = userCreditRepository.findUserCreditBy(testUser.id())
                 .orElseThrow()
                 .getCredit()
                 .creditAmount();
@@ -136,7 +135,7 @@ public class CreditIntegrationTest {
         // then
         assertThat(idempotencyRepository.exists(IdempotencyKey.from(IDEMPOTENCY_KEY))).isTrue();
 
-        long actualUserCreditAmount = userCreditRepository.getUserCredit(testUser.id())
+        long actualUserCreditAmount = userCreditRepository.findUserCreditBy(testUser.id())
                 .orElseThrow()
                 .getCredit()
                 .creditAmount();
@@ -168,7 +167,7 @@ public class CreditIntegrationTest {
         // then
         assertThat(idempotencyRepository.exists(IdempotencyKey.from(IDEMPOTENCY_KEY))).isTrue();
 
-        long actualUserCreditAmount = userCreditRepository.getUserCredit(testUser.id())
+        long actualUserCreditAmount = userCreditRepository.findUserCreditBy(testUser.id())
                 .orElseThrow()
                 .getCredit()
                 .creditAmount();
@@ -195,7 +194,7 @@ public class CreditIntegrationTest {
         ));
 
         // then
-        long actualUserCreditAmount = userCreditRepository.getUserCredit(testUser.id())
+        long actualUserCreditAmount = userCreditRepository.findUserCreditBy(testUser.id())
                 .orElseThrow()
                 .getCredit()
                 .creditAmount();
@@ -271,7 +270,7 @@ public class CreditIntegrationTest {
         assertThat(idempotencyRepository.exists(IdempotencyKey.from(IDEMPOTENCY_KEY))).isFalse();
 
         // 최종 크레딧 금액은 변경되지 않아야 함
-        long actualUserCreditAmount = userCreditRepository.getUserCredit(testUser.id())
+        long actualUserCreditAmount = userCreditRepository.findUserCreditBy(testUser.id())
                 .orElseThrow()
                 .getCredit()
                 .creditAmount();
@@ -307,7 +306,7 @@ public class CreditIntegrationTest {
         // then
         assertThat(idempotencyRepository.exists(IdempotencyKey.from(IDEMPOTENCY_KEY))).isTrue();
 
-        long actualUserCreditAmount = userCreditRepository.getUserCredit(testUser.id())
+        long actualUserCreditAmount = userCreditRepository.findUserCreditBy(testUser.id())
                 .orElseThrow()
                 .getCredit()
                 .creditAmount();
