@@ -13,22 +13,6 @@ public class UserAccountInfo {
     private String email;
     private Long currentCreditAmount;
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getNickname() {
-        return nickname;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public Long getCurrentCreditAmount() {
-        return currentCreditAmount;
-    }
-
     public static UserAccountInfo from(final UserAccount userAccount, final UserCredit currentCredit) {
         return UserAccountInfo.builder()
                 .id(userAccount.getId())
