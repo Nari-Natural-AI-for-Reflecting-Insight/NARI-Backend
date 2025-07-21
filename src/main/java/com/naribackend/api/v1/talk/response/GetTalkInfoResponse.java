@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Getter
 @Builder
@@ -28,6 +29,11 @@ public class GetTalkInfoResponse {
     private LocalDateTime expiredAt;
 
     public static GetTalkInfoResponse from(TalkInfo talkInfo) {
+
+        if(Objects.isNull(talkInfo)) {
+            return null;
+        }
+
         return GetTalkInfoResponse.builder()
                 .talkId(talkInfo.getTalkId())
                 .createdUserId(talkInfo.getCreatedUserId())
