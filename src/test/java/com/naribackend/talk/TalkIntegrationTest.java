@@ -180,7 +180,7 @@ public class TalkIntegrationTest {
                         .flatMap(
                         user -> IntStream.rangeClosed(1, sessionsPerUser)
                                         .mapToObj(childNum -> {
-                                            int expiredTimeIntervalInMinutes = (int) (Math.random() * 100) - 90; // -50 ~ 50 사이의 랜덤한 만료 시간
+                                            int expiredTimeIntervalInMinutes = (int) (Math.random() * 101) - 50; // -50 ~ 50 사이의 랜덤한 만료 시간
                                             int talkStatusIndex =  childNum % talkStatus.size();
                                             TalkStatus parentTalkStatus = talkStatus.get(talkStatusIndex);
                                             int childTalkSessionNum = 2;
