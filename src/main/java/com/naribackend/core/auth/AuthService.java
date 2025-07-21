@@ -1,6 +1,8 @@
 package com.naribackend.core.auth;
 
 import com.naribackend.core.DateTimeProvider;
+import com.naribackend.core.credit.UserCredit;
+import com.naribackend.core.credit.UserCreditRepository;
 import com.naribackend.core.email.EmailMessage;
 import com.naribackend.core.email.EmailSender;
 import com.naribackend.core.email.UserEmail;
@@ -30,6 +32,8 @@ public class AuthService {
     private final AccessTokenHandler accessTokenHandler;
 
     private final DateTimeProvider dateTimeProvider;
+
+    private final UserCreditRepository userCreditRepository;
 
     private final static long EMAIL_VERIFICATION_TTL = 60 * 5; // 인증 코드의 TTL은 5분
 
@@ -113,9 +117,14 @@ public class AuthService {
         return accessTokenHandler.createTokenBy(userAccount.getId());
     }
 
-    public UserAccount getUserAccountBy(final LoginUser loginUser) {
-        return userAccountRepository.findById(loginUser.getId())
+    public UserAccountInfo getUserAccountInfoBy(final LoginUser loginUser) {
+        UserAccount userAccount = userAccountRepository.findById(loginUser.getId())
                 .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_EMAIL));
+
+        UserCredit currentUserCredit = userCreditRepository.findUserCreditBy(loginUser.getId())
+                .orElse(UserCredit.empty(loginUser.getId()));
+
+        return UserAccountInfo.from(userAccount, currentUserCredit);
     }
 
 }

@@ -27,4 +27,13 @@ public class UserCredit {
     public Credit currentCredit() {
         return this.credit;
     }
+
+    public static UserCredit empty(final Long userId) {
+        return UserCredit.builder()
+                .id(null)
+                .userId(userId)
+                .credit(Credit.newZeroCredit())
+                .version(0L)
+                .build();
+    }
 }

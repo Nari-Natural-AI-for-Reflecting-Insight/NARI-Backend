@@ -4,7 +4,7 @@ import java.util.Optional;
 
 public interface UserCreditRepository {
 
-    Optional<UserCredit> getUserCredit(Long targetUserId);
+    Optional<UserCredit> findUserCreditBy(Long targetUserId);
 
     void save(UserCredit userCredit);
 }
