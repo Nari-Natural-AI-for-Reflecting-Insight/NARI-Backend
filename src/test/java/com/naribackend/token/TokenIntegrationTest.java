@@ -105,7 +105,7 @@ public class TokenIntegrationTest {
 
         // then
         // 남은 크레딧 금액 검증
-        long actualUserCreditAmount = userCreditRepository.getUserCredit(testUser.id())
+        long actualUserCreditAmount = userCreditRepository.findUserCreditBy(testUser.id())
                 .orElseThrow()
                 .getCredit()
                 .creditAmount();
@@ -133,7 +133,7 @@ public class TokenIntegrationTest {
 
         // then
         // 크레딧이 결제되지 않았는지 검증
-        long actualUserCreditAmount = userCreditRepository.getUserCredit(testUser.id())
+        long actualUserCreditAmount = userCreditRepository.findUserCreditBy(testUser.id())
                 .orElseThrow()
                 .getCredit()
                 .creditAmount();
@@ -169,7 +169,7 @@ public class TokenIntegrationTest {
 
         // then
         // 최종 크레딧 금액 검증
-        long actualUserCreditAmount = userCreditRepository.getUserCredit(testUser.id())
+        long actualUserCreditAmount = userCreditRepository.findUserCreditBy(testUser.id())
                 .orElseThrow()
                 .getCredit()
                 .toCreditAmount();
@@ -215,7 +215,7 @@ public class TokenIntegrationTest {
 
         // then
         // 최종 크레딧 금액 검증
-        long actualUserCreditAmount = userCreditRepository.getUserCredit(testUser.id())
+        long actualUserCreditAmount = userCreditRepository.findUserCreditBy(testUser.id())
                 .orElseThrow()
                 .getCredit()
                 .toCreditAmount();
