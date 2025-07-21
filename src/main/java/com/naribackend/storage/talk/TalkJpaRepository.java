@@ -20,17 +20,18 @@ public interface TalkJpaRepository extends JpaRepository<TalkEntity, Long> {
      * @return 조건을 만족하는 Talk 엔티티
      */
     @Query("""
-        select t
-        from TalkEntity t
-        where t.status <> com.naribackend.core.talk.TalkStatus.COMPLETED
-        and t.createdUserId = :userId
-        and (select count(s)
-            from TalkSessionEntity s
-            where s.parentTalkId = t.id) < :maxSessionCountPerPay
-        order by (select count(s2)
-              from TalkSessionEntity s2
-              where s2.parentTalkId = t.id) desc,
-             t.expiredAt asc
+        select talkEntity
+        from TalkEntity talkEntity
+        where talkEntity.status <> com.naribackend.core.talk.TalkStatus.COMPLETED
+        and talkEntity.createdUserId = :userId
+        and (select count(talkSessionEntity)
+            from TalkSessionEntity talkSessionEntity
+            where talkSessionEntity.parentTalkId = talkEntity.id) < :maxSessionCountPerPay
+                and talkEntity.expiredAt > current_timestamp
+        order by (select count(talkSessionEntity2)
+              from TalkSessionEntity talkSessionEntity2
+              where talkSessionEntity2.parentTalkId = talkEntity.id) desc,
+             talkEntity.expiredAt asc
     """)
     Page<TalkEntity> findCandidateTalk(
             @Param("userId") Long userId,

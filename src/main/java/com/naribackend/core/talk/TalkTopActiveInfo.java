@@ -23,6 +23,7 @@ public class TalkTopActiveInfo {
 
     public static TalkTopActiveInfo empty() {
         return TalkTopActiveInfo.builder()
+                .topActiveTalkInfo(null)
                 .existsActiveTalk(false)
                 .topActiveTalkInfo(null)
                 .maxSessionCountPerPay(0)
