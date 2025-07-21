@@ -31,7 +31,7 @@ public class GetTalkInfoResponse {
     public static GetTalkInfoResponse from(TalkInfo talkInfo) {
 
         if(Objects.isNull(talkInfo)) {
-            return empty();
+            return null;
         }
 
         return GetTalkInfoResponse.builder()
@@ -44,9 +44,5 @@ public class GetTalkInfoResponse {
                 .modifiedAt(talkInfo.getModifiedAt())
                 .expiredAt(talkInfo.getExpiredAt())
                 .build();
-    }
-
-    public static GetTalkInfoResponse empty() {
-        return null;
     }
 }
