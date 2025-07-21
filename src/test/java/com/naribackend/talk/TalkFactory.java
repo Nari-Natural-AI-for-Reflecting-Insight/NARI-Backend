@@ -109,7 +109,35 @@ public class TalkFactory {
     public Talk createCompletedTalk(
             final long createdUserId,
             final LocalDateTime completedAt
-            ) {
+    ) {
+        var userCreditHistory = UserCreditHistory.builder()
+                .createdUserId(createdUserId)
+                .reason(CreditOperationReason.DAILY_COUNSELING)
+                .changedCreditAmount(-1000L)
+                .currentCredit(Credit.from(10000L))
+                .build();
+
+        var savedPaidUserCreditHistory = userCreditHistoryRepository.save(userCreditHistory);
+
+        // completed Talk 생성, expired은 된게 아님
+        Talk talk = Talk.builder()
+                .createdUserId(createdUserId)
+                .paidUserCreditHistoryId(savedPaidUserCreditHistory.getId())
+                .status(TalkStatus.CREATED)
+                .createdAt(dateTimeProvider.getCurrentDateTime())
+                .expiredAt(dateTimeProvider.getCurrentDateTime()
+                        .plusMinutes(30))
+                .build();
+
+        talk.complete(completedAt);
+
+        return talkRepository.save(talk);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public Talk createExpiredTalk(
+            final long createdUserId
+    ) {
         var userCreditHistory = UserCreditHistory.builder()
                 .createdUserId(createdUserId)
                 .reason(CreditOperationReason.DAILY_COUNSELING)
@@ -123,9 +151,9 @@ public class TalkFactory {
                 .createdUserId(createdUserId)
                 .paidUserCreditHistoryId(savedPaidUserCreditHistory.getId())
                 .status(TalkStatus.CREATED)
+                .createdAt(dateTimeProvider.getCurrentDateTime().minusDays(1))
+                .expiredAt(dateTimeProvider.getCurrentDateTime().minusHours(1))
                 .build();
-
-        talk.complete(completedAt);
 
         return talkRepository.save(talk);
     }

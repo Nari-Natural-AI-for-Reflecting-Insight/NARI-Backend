@@ -127,6 +127,7 @@ public class TalkIntegrationTest {
                 testUser.id()
         );
 
+        // Talk가 완료되도록 Talk Session을 생성
         for(int i=0; i < talkPolicyProperties.getMaxSessionCountPerPay(); i++) {
             talkSessionService.createTalkSession(
                     expectedParentTalk.getId(),
@@ -134,6 +135,24 @@ public class TalkIntegrationTest {
                     IdempotencyKey.from(IDEMPOTENCY_KEY + i)
             );
         }
+
+        // when
+        var topActiveTalkInfo = talkService.getTopActiveTalkInfo(testUser.toLoginUser());
+
+        // then
+        assertThat(topActiveTalkInfo.isExistsActiveTalk()).isFalse();
+    }
+
+    @Test
+    @DisplayName("top active talk 조회 성공 - 만료된 Talk가 있는 경우")
+    void get_top_active_talk_service_success_expired_talk() {
+        // given
+        TestUser testUser = testUserFactory.createTestUser();
+
+        // 기간이 지나 만료된 Talk 생성
+        talkFactory.createExpiredTalk(
+                testUser.id()
+        );
 
         // when
         var topActiveTalkInfo = talkService.getTopActiveTalkInfo(testUser.toLoginUser());
@@ -161,7 +180,7 @@ public class TalkIntegrationTest {
                         .flatMap(
                         user -> IntStream.rangeClosed(1, sessionsPerUser)
                                         .mapToObj(childNum -> {
-                                            int expiredTimeIntervalInMinutes = (int) (Math.random() * 100);
+                                            int expiredTimeIntervalInMinutes = (int) (Math.random() * 100) - 90; // -50 ~ 50 사이의 랜덤한 만료 시간
                                             int talkStatusIndex =  childNum % talkStatus.size();
                                             TalkStatus parentTalkStatus = talkStatus.get(talkStatusIndex);
                                             int childTalkSessionNum = 2;
@@ -185,11 +204,13 @@ public class TalkIntegrationTest {
           2. Talk의 참여자가 expectedUserId 함
           3. 생성일로 오름차순, Talk의 sessionCount로 내림차순 정렬되어야 함
           4. max-session-count-per-pay 값이 Talk의 sessionCount보다 작아야함
+          5. Talk의 만료일이 현재 시간보다 이후여야 함
          */
         var expectedTopActiveTalkInfos = talkInfos.stream()
                 .filter(talkInfo -> talkInfo.getCreatedSessionCount() < maxSessionCountPerPay)
                 .filter(talkInfo -> !talkInfo.getStatus().isCompleted())
                 .filter(talkInfo -> talkInfo.getCreatedUserId().equals(expectedUserId))
+                .filter(talkInfo -> talkInfo.getExpiredAt().isAfter(LocalDateTime.now()))
                 .sorted(Comparator.comparing(TalkInfo::getCreatedSessionCount, Comparator.reverseOrder())
                         .thenComparing(TalkInfo::getExpiredAt))
                 .toList();
