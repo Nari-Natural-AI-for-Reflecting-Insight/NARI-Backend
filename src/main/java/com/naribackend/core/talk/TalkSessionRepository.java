@@ -16,4 +16,6 @@ public interface TalkSessionRepository {
     Optional<TalkSession> findById(Long talkSessionId);
 
     int modifyNotCanceledStatusToCompletedStatusBy(LoginUser createdUser, Talk parentTalk, LocalDateTime completedAt);
+
+    void modifyInProgressStatusToCanceledStatusBy(LoginUser loginUser, Talk talk);
 }

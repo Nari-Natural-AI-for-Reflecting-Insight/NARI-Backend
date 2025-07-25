@@ -39,6 +39,25 @@ public enum ErrorType {
     TALK_SESSION_COMPLETED(HttpStatus.CONFLICT, ErrorCode.E409, "이미 완료된 대화 세션입니다.", LogLevel.INFO),
     TALK_SESSION_NOT_FOUND(HttpStatus.NOT_FOUND, ErrorCode.E404, "해당 대화 세션을 찾을 수 없습니다.", LogLevel.INFO),
     INVALID_USER_REQUEST(HttpStatus.FORBIDDEN, ErrorCode.E403, "해당 요청은 권한이 없습니다.", LogLevel.INFO),
+    TALK_ALREADY_CANCELED(HttpStatus.CONFLICT, ErrorCode.E409, "해당 대화는 이미 취소되었습니다.", LogLevel.DEBUG),
+    TALK_SESSION_CANNOT_BE_STARTED(
+            HttpStatus.CONFLICT,
+            ErrorCode.E409,
+            "해당 대화 세션은 시작할 수 없습니다.",
+            LogLevel.DEBUG
+    ),
+    TALK_ALREADY_IN_PROGRESS(
+            HttpStatus.CONFLICT,
+            ErrorCode.E409,
+            "해당 대화는 이미 진행 중입니다.",
+            LogLevel.DEBUG
+    ),
+    TALK_CANNOT_BE_CANCELED(
+            HttpStatus.CONFLICT,
+            ErrorCode.E409,
+            "해당 대화는 취소할 수 없습니다.",
+            LogLevel.DEBUG
+    ),
     TALK_ALREADY_COMPLETED(
             HttpStatus.CONFLICT,
             ErrorCode.E409,

@@ -29,6 +29,14 @@ public class TalkSession {
                 .build();
     }
 
+    public static TalkSession startBy(final Talk parentTalk) {
+        return TalkSession.builder()
+                .parentTalkId(parentTalk.getId())
+                .createdUserId(parentTalk.getCreatedUserId())
+                .status(TalkSessionStatus.IN_PROGRESS)
+                .build();
+    }
+
     public void complete(final LocalDateTime currentTime) {
         this.status = TalkSessionStatus.COMPLETED;
         this.completedAt = currentTime;

@@ -28,4 +28,14 @@ public interface TalkSessionJpaRepository extends JpaRepository<TalkSessionEntit
             Long talkId,
             LocalDateTime completedAt
     );
+
+    @Modifying
+    @Query("""
+        UPDATE TalkSessionEntity t
+        SET t.status = 'CANCELED'
+            WHERE t.status = 'IN_PROGRESS'
+                AND t.createdUserId = :createdUserId
+                AND t.parentTalkId = :talkId
+    """)
+    void modifyInProgressStatusToCanceledStatusBy(Long createdUserId, Long talkId);
 }

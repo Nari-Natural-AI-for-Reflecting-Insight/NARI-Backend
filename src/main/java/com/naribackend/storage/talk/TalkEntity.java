@@ -5,13 +5,13 @@ import com.naribackend.core.talk.TalkStatus;
 import com.naribackend.storage.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @Table(name = "talk")
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
@@ -45,6 +45,8 @@ public class TalkEntity extends BaseEntity {
                 .status(talk.getStatus())
                 .expiredAt(talk.getExpiredAt())
                 .completedAt(talk.getCompletedAt())
+                .createdAt(talk.getCreatedAt())
+                .modifiedAt(talk.getModifiedAt())
                 .build();
     }
 

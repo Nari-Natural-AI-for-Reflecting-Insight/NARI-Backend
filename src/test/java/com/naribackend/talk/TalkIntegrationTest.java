@@ -3,7 +3,6 @@ package com.naribackend.talk;
 import com.jayway.jsonpath.JsonPath;
 import com.naribackend.core.DateTimeProvider;
 import com.naribackend.core.auth.LoginUser;
-import com.naribackend.core.idempotency.IdempotencyKey;
 import com.naribackend.core.talk.*;
 import com.naribackend.support.TestUser;
 import com.naribackend.support.TestUserFactory;
@@ -126,15 +125,14 @@ public class TalkIntegrationTest {
         Talk expectedParentTalk = talkFactory.createTalk(
                 testUser.id()
         );
+        expectedParentTalk.start();
+        expectedParentTalk.complete(LocalDateTime.now());
+        expectedParentTalk = talkRepository.save(expectedParentTalk);
 
-        // Talk가 완료되도록 Talk Session을 생성
-        for(int i=0; i < talkPolicyProperties.getMaxSessionCountPerPay(); i++) {
-            talkSessionService.createTalkSession(
-                    expectedParentTalk.getId(),
-                    testUser.toLoginUser(),
-                    IdempotencyKey.from(IDEMPOTENCY_KEY + i)
-            );
-        }
+        talkService.completeTalk(
+                testUser.toLoginUser(),
+                expectedParentTalk.getId()
+        );
 
         // when
         var topActiveTalkInfo = talkService.getTopActiveTalkInfo(testUser.toLoginUser());
