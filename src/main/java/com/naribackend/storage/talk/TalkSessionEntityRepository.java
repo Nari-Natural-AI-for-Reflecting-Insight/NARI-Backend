@@ -59,4 +59,12 @@ public class TalkSessionEntityRepository implements TalkSessionRepository {
                 completedAt
         );
     }
+
+    @Override
+    public void modifyInProgressStatusToCanceledStatusBy(LoginUser loginUser, Talk talk) {
+        talkSessionJpaRepository.modifyInProgressStatusToCanceledStatusBy(
+                loginUser.getId(),
+                talk.getId()
+        );
+    }
 }

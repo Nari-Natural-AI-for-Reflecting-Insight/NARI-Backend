@@ -46,6 +46,8 @@ public class TalkService {
         }
 
         LocalDateTime completedAt = dateTimeProvider.getCurrentDateTime();
+
+        // Talk Session의 상태를 완료로 변경
         talkSessionRepository.modifyNotCanceledStatusToCompletedStatusBy(loginUser, talk, completedAt);
 
         talk.complete(completedAt);
@@ -61,6 +63,9 @@ public class TalkService {
         if (!talk.isUserCreated(loginUser)) {
             throw new CoreException(ErrorType.INVALID_USER_REQUEST);
         }
+
+        // Talk Session의 상태를 취소로 변경
+        talkSessionRepository.modifyInProgressStatusToCanceledStatusBy(loginUser, talk);
 
         talk.cancel();
         talkRepository.save(talk);
