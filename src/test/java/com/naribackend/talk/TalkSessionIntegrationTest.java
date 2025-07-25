@@ -4,10 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import com.naribackend.api.v1.talk.request.CreateTalkSessionRequest;
 import com.naribackend.core.DateTimeProvider;
-import com.naribackend.core.talk.Talk;
-import com.naribackend.core.talk.TalkPolicyProperties;
-import com.naribackend.core.talk.TalkSession;
-import com.naribackend.core.talk.TalkSessionRepository;
+import com.naribackend.core.talk.*;
 import com.naribackend.storage.talk.TalkSessionJpaRepository;
 import com.naribackend.support.TestUser;
 import com.naribackend.support.TestUserFactory;
@@ -61,6 +58,9 @@ public class TalkSessionIntegrationTest {
     @MockitoSpyBean
     private DateTimeProvider dateTimeProvider;
 
+    @Autowired
+    private TalkRepository talkRepository;
+
     private static final String TALK_SESSION_PATH = "/api/v1/talk/session";
 
     private static final String IDEMPOTENCY_KEY = "talk-session-idempotency-key";
@@ -89,13 +89,18 @@ public class TalkSessionIntegrationTest {
                         jsonPath("$.data.parentTalkId").value(parentTalk.getId()),
                         jsonPath("$.data.createdUserId").value(testUser.id()),
                         jsonPath("$.data.createdAt").exists(),
-                        jsonPath("$.data.status").value("CREATED")
+                        jsonPath("$.data.status").value(TalkSessionStatus.IN_PROGRESS.name())
                 )
                 .andExpect(mvcResult -> {
                     String jsonResponse = mvcResult.getResponse().getContentAsString();
                     Long createdTalkSessionId = JsonPath.parse(jsonResponse).read("$.data.talkSessionId", Long.class);
                     assertThat(talkSessionJpaRepository.existsById(createdTalkSessionId)).isTrue();
                 });
+
+        Talk modifiedTalk = talkRepository.findById(parentTalk.getId())
+                .orElseThrow(() -> new IllegalStateException("Talk not found"));
+
+        assertThat(modifiedTalk.getStatus()).isEqualTo(TalkStatus.IN_PROGRESS);
     }
 
     @Test
@@ -118,6 +123,15 @@ public class TalkSessionIntegrationTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk());
+
+
+            Talk modifiedTalk = talkRepository.findById(parentTalk.getId())
+                    .orElseThrow(() -> new IllegalStateException("Talk not found"));
+
+            assertThat(modifiedTalk.getStatus()).isEqualTo(TalkStatus.IN_PROGRESS);
+
+            modifiedTalk.cancel();
+            talkRepository.save(modifiedTalk);
         }
     }
 
@@ -127,9 +141,9 @@ public class TalkSessionIntegrationTest {
 
         // given
         TestUser testUser = testUserFactory.createTestUser();
-        Long invalidCreditHistoryId = 999L;
+        TestUser otherTestUser = testUserFactory.createTestUser();
         var request = CreateTalkSessionRequest.builder()
-                .parentTalkId(invalidCreditHistoryId)
+                .parentTalkId(otherTestUser.id())
                 .idempotencyKey(IDEMPOTENCY_KEY)
                 .build();
 
