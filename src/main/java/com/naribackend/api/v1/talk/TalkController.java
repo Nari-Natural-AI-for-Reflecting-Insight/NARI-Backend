@@ -41,6 +41,20 @@ public class TalkController {
     }
 
     @Operation(
+            summary = "Talk 취소",
+            description = "Talk을 취소합니다. 이 API는 진행중인 Talk를 취소할 때, 호출되어야 합니다."
+    )
+    @PostMapping("/{talkId}/cancel")
+    public ApiResponse<?> cancelTalk(
+            @Parameter(hidden = true) @CurrentUser final LoginUser loginUser,
+            @PathVariable final Long talkId
+    ) {
+        talkService.cancelTalk(loginUser, talkId);
+
+        return ApiResponse.success();
+    }
+
+    @Operation(
             summary = "Talk Session 생성",
             description = "실시간 대화와 관련된 정보를 기록하는 Talk Session을 생성합니다. 이 API는 외부 대화 Session 이 시작될 때 호출되어야 합니다."
     )

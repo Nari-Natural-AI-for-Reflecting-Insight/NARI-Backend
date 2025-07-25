@@ -51,4 +51,18 @@ public class TalkService {
         talk.complete(completedAt);
         talkRepository.save(talk);
     }
+
+    @Transactional
+    public void cancelTalk(final LoginUser loginUser, final Long talkId) {
+
+        Talk talk = talkRepository.findById(talkId)
+                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_TALK));
+
+        if (!talk.isUserCreated(loginUser)) {
+            throw new CoreException(ErrorType.INVALID_USER_REQUEST);
+        }
+
+        talk.cancel();
+        talkRepository.save(talk);
+    }
 }
