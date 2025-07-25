@@ -63,17 +63,14 @@ public class TalkSessionService {
             throw new CoreException(ErrorType.COMPLETED_TALK_SESSION_EXISTS);
         }
 
-        // Talk 완료 처리, 최대 세션 수에 도달한 경우
-        if (childTalkSession >= talkPolicyProperties.getMaxSessionCountPerPay() - 1) {
-            parentTalk.complete(dateTimeProvider.getCurrentDateTime());
-            talkRepository.save(parentTalk);
-        }
+        // Talk 상태 IN_PROGRESS로 변경
+        parentTalk.start();
+        talkRepository.save(parentTalk);
 
-        TalkSession savedTalkSession = talkSessionRepository.save(
-                TalkSession.from(parentTalk)
+        // TalkSession 생성 및 상태 IN_PROGRESS로 설정
+        return talkSessionRepository.save(
+                TalkSession.startBy(parentTalk)
         );
-
-        return savedTalkSession;
     }
 
 
