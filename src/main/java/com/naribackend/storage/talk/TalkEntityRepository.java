@@ -35,8 +35,16 @@ public class TalkEntityRepository implements TalkRepository {
     }
 
     @Override
-    public Optional<Talk> findById(Long talkId) {
+    public Optional<Talk> findById(final Long talkId) {
         return talkJpaRepository.findById(talkId)
                 .map(TalkEntity::toTalk);
+    }
+
+    @Override
+    public Optional<Talk> findInProgressTalkBy(final LoginUser loginUser) {
+        return talkJpaRepository.findInProgressTalkBy(
+                loginUser.getId(),
+                Pageable.ofSize(1)
+        ).stream().findFirst().map(TalkEntity::toTalk);
     }
 }

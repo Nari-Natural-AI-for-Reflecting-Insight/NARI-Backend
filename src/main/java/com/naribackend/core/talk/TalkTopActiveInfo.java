@@ -3,6 +3,8 @@ package com.naribackend.core.talk;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.Objects;
+
 @Getter
 @Builder
 public class TalkTopActiveInfo {
@@ -14,8 +16,15 @@ public class TalkTopActiveInfo {
     private int maxSessionCountPerPay;
 
     public static TalkTopActiveInfo from(TalkInfo topActiveTalkInfo, int maxSessionCountPerPay) {
+
+        boolean existsActiveTalk = Objects.nonNull(topActiveTalkInfo);
+
+        if (!existsActiveTalk) {
+            return empty();
+        }
+
         return TalkTopActiveInfo.builder()
-                .existsActiveTalk(topActiveTalkInfo != null)
+                .existsActiveTalk(true)
                 .topActiveTalkInfo(topActiveTalkInfo)
                 .maxSessionCountPerPay(maxSessionCountPerPay)
                 .build();

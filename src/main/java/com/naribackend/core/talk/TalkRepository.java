@@ -15,11 +15,12 @@ public interface TalkRepository {
     * 2. Talk의 참여자가 로그인한 사용자여야 함
     * 3. 생성일로 오름차순, Talk의 sessionCount로 내림차순 정렬되어야 함
     * 4. Talk의 갯수은 1개여야 함
-    * 5. max-session-count-per-pay 값이 Talk의 sessionCount보다 작아야함
+    * 5. Talk의 sessionCount이 max-session-count-per-pay 값보다 작아야 함
     *
     * */
     Optional<Talk> findNotCompletedTopTalkById(LoginUser loginUser, long maxSessionCountPerPay);
 
     Optional<Talk> findById(Long talkId);
 
+    Optional<Talk> findInProgressTalkBy(LoginUser loginUser);
 }
