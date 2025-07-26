@@ -51,9 +51,6 @@ public class TalkIntegrationTest {
     private TalkService talkService;
 
     @Autowired
-    private TalkSessionService talkSessionService;
-
-    @Autowired
     private TalkPolicyProperties talkPolicyProperties;
 
     @MockitoSpyBean
@@ -161,7 +158,7 @@ public class TalkIntegrationTest {
     /**
      * top active talk 조회 성공 - 조회 조건 검사, IN_PROGRESS Talk가 없는 경우
      * 이 테스트는 Talk의 상태가 CREATED, CANCELED, COMPLETED인 경우에 대해 테스트
-     * IN_PROGRESS는 다른 조건을 무시하고 최우선적으로 조회되기 때문에,해당 테스트에서는 IN_PROGRESS Talk가 없는 후 순위 상태에 대해서 테스트 합니다.
+     * IN_PROGRESS는 다른 조건을 무시하고 최우선적으로 조회되기 때문에, 해당 테스트에서는 IN_PROGRESS Talk가 없는 후 순위 상태에 대해서 테스트 합니다.
      */
     @RepeatedTest(5)
     @DisplayName("top active talk 조회 성공 - 조회 조건 검사, IN_PROGRESS Talk가 없는 경우")

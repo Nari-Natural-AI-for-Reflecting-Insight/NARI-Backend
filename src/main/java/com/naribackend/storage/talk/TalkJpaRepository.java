@@ -39,6 +39,17 @@ public interface TalkJpaRepository extends JpaRepository<TalkEntity, Long> {
             Pageable pageable
     );
 
+    /**
+     * 현재 진행 중인 Talk를 조회합니다.
+     * 조건은 다음과 같습니다.
+     * 1. Talk가 IN_PROGRESS 상태여야 함
+     * 2. Talk의 참여자가 createdUserId여야 함
+     * 3. 만료일이 가장 빠른 Talk를 반환합니다.
+     *
+     * @param createdUserId 참여자 ID
+     * @param pageable 페이징 정보
+     * @return 현재 진행 중인 Talk 엔티티
+     */
     @Query("""
         select talkEntity
         from TalkEntity talkEntity
