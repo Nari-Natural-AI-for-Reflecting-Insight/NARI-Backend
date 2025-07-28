@@ -93,8 +93,8 @@ public class TalkController {
     }
 
     @Operation(
-            summary = "이용 가능한 Talk 중 하나의 Talk에 대해 상세 정보 조회",
-            description = "사용자가 이용 가능한 Talk를 하나에 대해 조회합니다. 이 API는 사용자가 Talk를 시작하기 전에 호출되어야 합니다."
+            summary = "우선적으로 사용되어야 하는 Talk 정보를 조회",
+            description = "우선적으로 사용되어야 하는 Talk 정보를 조회합니다. 이 API는 사용자가 Talk를 시작하기 전에 호출되어야 합니다."
     )
     @GetMapping("/top-active")
     public ApiResponse<?> getTopActiveTalkInfo(

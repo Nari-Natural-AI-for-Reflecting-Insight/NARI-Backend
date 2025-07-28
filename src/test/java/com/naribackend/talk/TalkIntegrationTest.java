@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -50,12 +51,9 @@ public class TalkIntegrationTest {
     private TalkService talkService;
 
     @Autowired
-    private TalkSessionService talkSessionService;
-
-    @Autowired
     private TalkPolicyProperties talkPolicyProperties;
 
-    @Autowired
+    @MockitoSpyBean
     private TalkRepository talkRepository;
 
     @Autowired
@@ -67,8 +65,6 @@ public class TalkIntegrationTest {
     private static final String TOP_ACTIVE_TALK_API_PATH = "/api/v1/talk/top-active";
 
     private static final String TALK_COMPLETED_API_PATH = "/api/v1/talk/{talkId}/complete";
-
-    private static final String IDEMPOTENCY_KEY = "top-active-talk";
 
     @MockitoSpyBean
     private DateTimeProvider dateTimeProvider;
@@ -159,8 +155,13 @@ public class TalkIntegrationTest {
         assertThat(topActiveTalkInfo.isExistsActiveTalk()).isFalse();
     }
 
+    /**
+     * top active talk 조회 성공 - 조회 조건 검사, IN_PROGRESS Talk가 없는 경우
+     * 이 테스트는 Talk의 상태가 CREATED, CANCELED, COMPLETED인 경우에 대해 테스트
+     * IN_PROGRESS는 다른 조건을 무시하고 최우선적으로 조회되기 때문에, 해당 테스트에서는 IN_PROGRESS Talk가 없는 후 순위 상태에 대해서 테스트 합니다.
+     */
     @RepeatedTest(5)
-    @DisplayName("top active talk 조회 성공 - 조회 조건 검사")
+    @DisplayName("top active talk 조회 성공 - 조회 조건 검사, IN_PROGRESS Talk가 없는 경우")
     void get_top_active_talk_service_success_check_sort_condition() {
         // given
         int userCount = 10;
@@ -168,7 +169,7 @@ public class TalkIntegrationTest {
         int maxSessionCountPerPay = talkPolicyProperties.getMaxSessionCountPerPay();
         var talkStatus = List.of(
                 TalkStatus.CREATED,
-                TalkStatus.IN_PROGRESS,
+                TalkStatus.CANCELED,
                 TalkStatus.COMPLETED
         );
 
@@ -201,8 +202,8 @@ public class TalkIntegrationTest {
           1. Talk가 COMPLETED 상태가 아니여야 함
           2. Talk의 참여자가 expectedUserId 함
           3. 생성일로 오름차순, Talk의 sessionCount로 내림차순 정렬되어야 함
-          4. max-session-count-per-pay 값이 Talk의 sessionCount보다 작아야함
-          5. Talk의 만료일이 현재 시간보다 이후여야 함
+          4. Talk의 sessionCount이 max-session-count-per-pay 값보다 작아야 함
+          5. Talk의 만료 시간이 현재 시간보다 이후여야 함
          */
         var expectedTopActiveTalkInfos = talkInfos.stream()
                 .filter(talkInfo -> talkInfo.getCreatedSessionCount() < maxSessionCountPerPay)
@@ -222,6 +223,36 @@ public class TalkIntegrationTest {
         // then
         assertThat(topActiveTalkInfo.isExistsActiveTalk()).isTrue();
         assertThat(topActiveTalkInfo.getTopActiveTalkInfo().getTalkId()).isEqualTo(expectedTopActiveTalkInfo.getTalkId());
+    }
+
+    @Test
+    @DisplayName("top active talk 조회 성공 - IN_PROGRESS Talk가 있는 경우, IN_PROGRESS Talk가 우선적으로 조회되어야 함")
+    void get_top_active_talk_service_success_in_progress_talk() {
+        // given
+        TestUser testUser = testUserFactory.createTestUser();
+        Talk expectedParentTalk = talkFactory.createTalk(
+                testUser.id()
+        );
+
+        // IN_PROGRESS Talk 변경
+        expectedParentTalk.start();
+        expectedParentTalk = talkRepository.save(expectedParentTalk);
+
+        // 다른 Talk 생성
+        Talk otherTalk = talkFactory.createTalk(
+                testUser.id()
+        );
+
+        // IN_PROGRESS가 없는 경우, 실행되는 메서드
+        when(talkRepository.findNotCompletedTopTalkById(testUser.toLoginUser(), talkPolicyProperties.getMaxSessionCountPerPay()))
+                .thenReturn(Optional.of(otherTalk));
+
+        // when
+        var topActiveTalkInfo = talkService.getTopActiveTalkInfo(testUser.toLoginUser());
+
+        // then
+        assertThat(topActiveTalkInfo.isExistsActiveTalk()).isTrue();
+        assertThat(topActiveTalkInfo.getTopActiveTalkInfo().getTalkId()).isEqualTo(expectedParentTalk.getId());
     }
 
     @Test
