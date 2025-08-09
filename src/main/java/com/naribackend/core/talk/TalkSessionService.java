@@ -82,13 +82,7 @@ public class TalkSessionService {
         TalkSession talkSession = talkSessionRepository.findById(sessionItem.talkSessionId())
                 .orElseThrow(() -> new CoreException(ErrorType.TALK_SESSION_NOT_FOUND));
 
-        if(talkSession.isCompleted()) {
-            throw new CoreException(ErrorType.TALK_SESSION_COMPLETED);
-        }
-
-        if (!talkSession.isUserCreated(loginUser.getId())) {
-            throw new CoreException(ErrorType.INVALID_USER_REQUEST_TALK_SESSION);
-        }
+        talkSession.validateCanCreateSessionItem(loginUser.getId());
 
         Talk parentTalk = talkRepository.findById(talkSession.getParentTalkId())
                 .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND_TALK));

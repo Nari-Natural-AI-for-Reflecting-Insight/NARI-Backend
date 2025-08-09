@@ -1,5 +1,7 @@
 package com.naribackend.core.talk;
 
+import com.naribackend.support.error.CoreException;
+import com.naribackend.support.error.ErrorType;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -48,5 +50,23 @@ public class TalkSession {
 
     public boolean isCompleted() {
         return this.status == TalkSessionStatus.COMPLETED;
+    }
+
+    public boolean isCanceled() {
+        return this.status == TalkSessionStatus.CANCELED;
+    }
+
+    public void validateCanCreateSessionItem(final Long loginUserId) {
+        if(this.isCompleted()) {
+            throw new CoreException(ErrorType.TALK_SESSION_COMPLETED);
+        }
+
+        if(this.isCanceled()) {
+            throw new CoreException(ErrorType.TALK_SESSION_CANCELED);
+        }
+
+        if(!this.isUserCreated(loginUserId)) {
+            throw new CoreException(ErrorType.INVALID_USER_REQUEST_TALK_SESSION);
+        }
     }
 }
