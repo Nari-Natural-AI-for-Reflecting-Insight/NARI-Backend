@@ -48,8 +48,10 @@ public class CreateDiaryScheduler {
 
             schLLMClient.sendChat(payload)
                 .subscribe( schLLMResponseData -> {
-                    log.debug("!!@@!! Diary created with status: {}", schLLMResponseData.responseMessage());
+                    log.debug("다이어리 생성 메시지 {}", schLLMResponseData.responseMessage());
                     schDiaryAppender.appendDiary(schLLMResponseData, schTalkSession);
+                }, error -> {
+                    log.error("다이어리 생성 실패! 에러 메시지: {}", error.getMessage());
                 });
 
             createdDiaryCount++;
