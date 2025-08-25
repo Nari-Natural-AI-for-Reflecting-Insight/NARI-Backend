@@ -1,7 +1,7 @@
 package com.naribackend.api.v1.credit.request;
 
-import com.naribackend.core.idempotency.IdempotencyKey;
 import com.naribackend.core.credit.PayCreditOperation;
+import com.naribackend.core.idempotency.IdempotencyKey;
 import jakarta.validation.constraints.NotBlank;
 
 public record PayCreditRequest (

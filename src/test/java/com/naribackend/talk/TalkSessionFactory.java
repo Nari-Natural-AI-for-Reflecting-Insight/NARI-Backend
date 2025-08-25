@@ -1,7 +1,10 @@
 package com.naribackend.talk;
 
 import com.naribackend.core.DateTimeProvider;
-import com.naribackend.core.talk.*;
+import com.naribackend.core.talk.Talk;
+import com.naribackend.core.talk.TalkSession;
+import com.naribackend.core.talk.TalkSessionRepository;
+import com.naribackend.core.talk.TalkSessionStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
