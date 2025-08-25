@@ -3,9 +3,10 @@ package com.naribackend.core.diary;
 import lombok.Builder;
 
 @Builder
-public record QnAInfo (
-    Long qnaId,
+public record DiaryQnA(
+    Long id,
     String question,
-    String answer
+    String answer,
+    Long diaryId
 ){
 }
