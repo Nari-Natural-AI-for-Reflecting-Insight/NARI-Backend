@@ -24,6 +24,6 @@ public class SchTalkSessionEntityRepository implements SchTalkSessionRepository 
 
     @Override
     public void save(SchTalkSession schTalkSession) {
-        schTalkSessionJpaRepository.save(schTalkSession.toEntity());
+        schTalkSessionJpaRepository.save(SchTalkSessionEntity.from(schTalkSession));
     }
 }

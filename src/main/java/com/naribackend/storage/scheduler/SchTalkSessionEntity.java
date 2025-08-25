@@ -62,4 +62,13 @@ public class SchTalkSessionEntity extends BaseEntity {
                 .isConvertedToDiary(this.isConvertedToDiary)
                 .build();
     }
+
+    public static SchTalkSessionEntity from(final SchTalkSession schTalkSession) {
+        return SchTalkSessionEntity.builder()
+                .id(schTalkSession.getTalkSessionId())
+                .status(schTalkSession.getStatus())
+                .createdUserId(schTalkSession.getCreatedUserId())
+                .isConvertedToDiary(schTalkSession.isConvertedToDiary())
+                .build();
+    }
 }

@@ -38,13 +38,4 @@ public class SchTalkSession {
         this.isConvertedToDiary = true;
     }
 
-
-    public SchTalkSessionEntity toEntity() {
-        return SchTalkSessionEntity.builder()
-                .id(this.talkSessionId)
-                .status(this.status)
-                .createdUserId(this.createdUserId)
-                .isConvertedToDiary(this.isConvertedToDiary)
-                .build();
-    }
 }
