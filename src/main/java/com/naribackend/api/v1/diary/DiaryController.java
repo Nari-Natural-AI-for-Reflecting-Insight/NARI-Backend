@@ -3,7 +3,7 @@ package com.naribackend.api.v1.diary;
 import com.naribackend.api.v1.diary.response.GetDiariesResponse;
 import com.naribackend.core.auth.CurrentUser;
 import com.naribackend.core.auth.LoginUser;
-import com.naribackend.core.diary.DiaryInfo;
+import com.naribackend.core.diary.Diary;
 import com.naribackend.core.diary.DiaryService;
 import com.naribackend.support.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,14 +29,14 @@ public class DiaryController {
     )
     @GetMapping("/diaries")
     public ApiResponse<?> getDiaries(
-            @Parameter(hidden = true) @CurrentUser LoginUser loginUser,
-            @RequestParam int year,
-            @RequestParam int month
+            @Parameter(hidden = true) @CurrentUser final LoginUser loginUser,
+            @RequestParam final int year,
+            @RequestParam final int month
     ) {
-        List<DiaryInfo> diaryInfos = diaryService.getDiaryInfos(loginUser, year, month);
+        List<Diary> diaries = diaryService.findDiariesBy(loginUser, year, month);
 
         return ApiResponse.success(
-                GetDiariesResponse.from(diaryInfos)
+                GetDiariesResponse.from(diaries)
         );
     }
 }

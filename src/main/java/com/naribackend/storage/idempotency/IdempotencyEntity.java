@@ -2,7 +2,10 @@ package com.naribackend.storage.idempotency;
 
 import com.naribackend.core.idempotency.IdempotencyKey;
 import com.naribackend.storage.BaseEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.*;
 
 @Entity

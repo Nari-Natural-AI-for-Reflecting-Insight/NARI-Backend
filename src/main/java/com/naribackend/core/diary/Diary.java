@@ -6,10 +6,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Builder
-public record DiaryInfo (
-        Long diaryId,
-        List<QnAInfo> qnaList,
+public record Diary(
+        Long id,
+        List<DiaryQnA> qnaList,
         LocalDateTime diaryDate,
-        DiaryStatus status
+        DiaryStatus status,
+        Long userId
 ){
 }

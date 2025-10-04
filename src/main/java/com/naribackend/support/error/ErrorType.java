@@ -40,6 +40,7 @@ public enum ErrorType {
     TALK_SESSION_NOT_FOUND(HttpStatus.NOT_FOUND, ErrorCode.E404, "해당 대화 세션을 찾을 수 없습니다.", LogLevel.INFO),
     INVALID_USER_REQUEST(HttpStatus.FORBIDDEN, ErrorCode.E403, "해당 요청은 권한이 없습니다.", LogLevel.INFO),
     TALK_ALREADY_CANCELED(HttpStatus.CONFLICT, ErrorCode.E409, "해당 대화는 이미 취소되었습니다.", LogLevel.DEBUG),
+    TALK_SESSION_CANCELED(HttpStatus.CONFLICT, ErrorCode.E409, "해당 대화 세션은 이미 취소되었습니다.", LogLevel.DEBUG),
     TALK_SESSION_CANNOT_BE_STARTED(
             HttpStatus.CONFLICT,
             ErrorCode.E409,
@@ -105,7 +106,26 @@ public enum ErrorType {
             ErrorCode.E409,
             "해당 크레딧 이력으로 이미 완료된 대화 세션이 존재합니다.",
             LogLevel.INFO
-    );
+    ),
+    INTERNAL_INVALID_ARGUMENT(
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            ErrorCode.E500,
+            "잘못된 인자입니다. 이 오류는 서버 내부에서 발생한 문제로, 요청이 올바르지 않거나 예상치 못한 상황이 발생했음을 나타냅니다.",
+            LogLevel.ERROR
+    ),EXTERNAL_SERVICE_ERROR(
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            ErrorCode.E502,
+            "외부 서비스 호출 중 오류가 발생했습니다. 이 오류는 외부 API나 서비스와의 통신에서 문제가 발생했음을 나타냅니다.",
+            LogLevel.ERROR
+    ),
+    INTERNAL_JSON_PROCESSING_ERROR(
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            ErrorCode.E500,
+            "JSON 처리 중 오류가 발생했습니다. 이 오류는 JSON 데이터의 직렬화 또는 역직렬화 과정에서 문제가 발생했음을 나타냅니다.",
+            LogLevel.ERROR
+    ),
+
+    ;
 
     private final HttpStatus status;
 
