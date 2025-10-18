@@ -4,13 +4,11 @@ import com.naribackend.core.talk.TalkSession;
 import com.naribackend.core.talk.TalkSessionStatus;
 import com.naribackend.storage.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
+@Getter
 @Entity
 @Builder
 @AllArgsConstructor
@@ -53,6 +51,12 @@ public class TalkSessionEntity extends BaseEntity {
                 .status(this.status)
                 .createdAt(this.getCreatedAt())
                 .completedAt(this.completedAt)
+                .build();
+    }
+
+    public static TalkSessionEntity from(final Long talkSessionId) {
+        return TalkSessionEntity.builder()
+                .id(talkSessionId)
                 .build();
     }
 }

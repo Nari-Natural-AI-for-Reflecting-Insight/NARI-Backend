@@ -6,6 +6,7 @@ import com.naribackend.core.credit.UserCreditRepository;
 import com.naribackend.core.email.EmailMessage;
 import com.naribackend.core.email.EmailSender;
 import com.naribackend.core.email.UserEmail;
+import com.naribackend.core.talk.TalkReader;
 import com.naribackend.support.error.CoreException;
 import com.naribackend.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,8 @@ public class AuthService {
     private final DateTimeProvider dateTimeProvider;
 
     private final UserCreditRepository userCreditRepository;
+
+    private final TalkReader talkReader;
 
     private final static long EMAIL_VERIFICATION_TTL = 60 * 5; // 인증 코드의 TTL은 5분
 
@@ -124,7 +127,9 @@ public class AuthService {
         UserCredit currentUserCredit = userCreditRepository.findUserCreditBy(loginUser.getId())
                 .orElse(UserCredit.empty(loginUser.getId()));
 
-        return UserAccountInfo.from(userAccount, currentUserCredit);
+        int currentTalkCount = talkReader.countUserTalks(loginUser);
+
+        return UserAccountInfo.of(userAccount, currentUserCredit, currentTalkCount);
     }
 
 }

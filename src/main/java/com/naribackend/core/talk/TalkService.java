@@ -14,17 +14,16 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class TalkService {
 
-    private final TalkPolicyProperties talkPolicyProperties;
-
     private final TalkRepository talkRepository;
 
     private final TalkSessionRepository talkSessionRepository;
 
     private final DateTimeProvider dateTimeProvider;
 
+    private final TalkReader talkReader;
+
     /**
      * 우선적으로 사용되어야 하는 Talk 정보를 조회합니다.
-     *
      * 조건은 다음과 같습니다.
      * 1. 현재 진행 중인 Talk가 있다면, 만료일을 오름차순으로 Talk 정보를 반환합니다.
      * 2. 현재 진행 중인 Talk가 없다면, 사용자가 결제한 Talk 중에서 아직 완료되지 않은 Talk 정보를 반환합니다.
@@ -39,14 +38,7 @@ public class TalkService {
      * @return TalkTopActiveInfo 우선적으로 사용되어야 하는 Talk 정보
      */
     public TalkTopActiveInfo getTopActiveTalkInfo(final LoginUser loginUser) {
-
-        int maxSessionCountPerPay = talkPolicyProperties.getMaxSessionCountPerPay();
-
-        return talkRepository.findInProgressTalkBy(loginUser)
-                .or(() -> talkRepository.findNotCompletedTopTalkById(loginUser, maxSessionCountPerPay))
-                .map(talk -> TalkInfo.from(talk, talkSessionRepository.countBy(talk)))
-                .map(talkInfo -> TalkTopActiveInfo.from(talkInfo, maxSessionCountPerPay))
-                .orElseGet(TalkTopActiveInfo::empty);
+        return talkReader.getTopActiveTalkInfo(loginUser);
     }
 
     @Transactional

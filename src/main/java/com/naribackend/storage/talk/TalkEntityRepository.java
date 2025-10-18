@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -30,9 +32,26 @@ public class TalkEntityRepository implements TalkRepository {
         return talkJpaRepository.findCandidateTalk(
                 loginUser.getId(),
                 maxSessionCountPerPay,
+                LocalDateTime.now(),
                 Pageable.ofSize(1)
         ).stream().findFirst().map(TalkEntity::toTalk);
     }
+
+    @Override
+    public List<Talk> findActiveTalksBy(
+            final LoginUser loginUser,
+            final long maxSessionCountPerPay
+    ) {
+        return talkJpaRepository.findCandidateTalk(
+                loginUser.getId(),
+                maxSessionCountPerPay,
+                LocalDateTime.now(),
+                Pageable.unpaged()
+        ).stream()
+                .map(TalkEntity::toTalk)
+                .toList();
+    }
+
 
     @Override
     public Optional<Talk> findById(final Long talkId) {
@@ -44,6 +63,7 @@ public class TalkEntityRepository implements TalkRepository {
     public Optional<Talk> findInProgressTalkBy(final LoginUser loginUser) {
         return talkJpaRepository.findInProgressTalkBy(
                 loginUser.getId(),
+                LocalDateTime.now(),
                 Pageable.ofSize(1)
         ).stream().findFirst().map(TalkEntity::toTalk);
     }

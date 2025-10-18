@@ -8,7 +8,8 @@ public record GetUserInfoResponse (
         Long id,
         String nickname,
         String email,
-        Long currentCreditAmount
+        Long currentCreditAmount,
+        int currentTalkCount
 ){
     public static GetUserInfoResponse from(final UserAccountInfo userAccountInfo) {
         return GetUserInfoResponse.builder()
@@ -16,6 +17,7 @@ public record GetUserInfoResponse (
                 .nickname(userAccountInfo.getNickname())
                 .email(userAccountInfo.getEmail())
                 .currentCreditAmount(userAccountInfo.getCurrentCreditAmount())
+                .currentTalkCount(userAccountInfo.getCurrentTalkCount())
                 .build();
     }
 }

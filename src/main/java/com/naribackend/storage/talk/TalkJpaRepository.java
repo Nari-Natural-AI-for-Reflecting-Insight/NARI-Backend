@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
+
 public interface TalkJpaRepository extends JpaRepository<TalkEntity, Long> {
 
     /**
@@ -27,7 +29,7 @@ public interface TalkJpaRepository extends JpaRepository<TalkEntity, Long> {
         and (select count(talkSessionEntity)
             from TalkSessionEntity talkSessionEntity
             where talkSessionEntity.parentTalkId = talkEntity.id) < :maxSessionCountPerPay
-                and talkEntity.expiredAt > current_timestamp
+        and talkEntity.expiredAt > :currentDateTime
         order by (select count(talkSessionEntity2)
               from TalkSessionEntity talkSessionEntity2
               where talkSessionEntity2.parentTalkId = talkEntity.id) desc,
@@ -36,6 +38,7 @@ public interface TalkJpaRepository extends JpaRepository<TalkEntity, Long> {
     Page<TalkEntity> findCandidateTalk(
             @Param("userId") Long userId,
             @Param("maxSessionCountPerPay") long maxSessionCountPerPay,
+            @Param("currentDateTime") LocalDateTime currentDateTime,
             Pageable pageable
     );
 
@@ -55,7 +58,12 @@ public interface TalkJpaRepository extends JpaRepository<TalkEntity, Long> {
         from TalkEntity talkEntity
         where talkEntity.status = com.naribackend.core.talk.TalkStatus.IN_PROGRESS
         and talkEntity.createdUserId = :createdUserId
+        and talkEntity.expiredAt > :currentDateTime
         order by talkEntity.expiredAt asc
     """)
-    Page<TalkEntity> findInProgressTalkBy(long createdUserId, Pageable pageable);
+    Page<TalkEntity> findInProgressTalkBy(
+            long createdUserId,
+            LocalDateTime currentDateTime,
+            Pageable pageable
+    );
 }

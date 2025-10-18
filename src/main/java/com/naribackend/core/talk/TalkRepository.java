@@ -2,6 +2,7 @@ package com.naribackend.core.talk;
 
 import com.naribackend.core.auth.LoginUser;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface TalkRepository {
@@ -33,4 +34,6 @@ public interface TalkRepository {
      * @return 현재 진행 중인 Talk 정보
      */
     Optional<Talk> findInProgressTalkBy(LoginUser loginUser);
+
+    List<Talk> findActiveTalksBy(LoginUser loginUser, long maxSessionCountPerPay);
 }
